@@ -8,5 +8,8 @@
   "files.insertFinalNewline": true,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "js/ts.implicitProjectConfig.experimentalDecorators": true
+  "js/ts.implicitProjectConfig.experimentalDecorators": true,
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
 }
