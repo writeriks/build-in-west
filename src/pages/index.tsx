@@ -1,11 +1,36 @@
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Head from "next/head";
+import { api } from "../utils/api";
+import { useEffect, useState } from "react";
+import authenticationService from "../service/authentication-service.ts/authentication-service";
+import { type Auth0User, type FacebookUser } from "../types";
+import { type User } from "@prisma/client";
 
 export default function Home() {
   const { user, error, isLoading } = useUser();
-  console.log("🚀 ~ file: index.tsx:6 ~ Home ~ isLoading:", isLoading);
-  console.log("🚀 ~ file: index.tsx:6 ~ Home ~ error:", error);
-  console.log("🚀 ~ file: index.tsx:6 ~ Home ~ user:", user);
+  const [didSaveUser, setDidSaveUser] = useState(false);
+
+  const { data: dbUser } = api.user.getUser.useQuery({
+    id: user?.sid as string,
+  });
+  console.log("🚀 ~ file: index.tsx:16 ~ Home ~ dbUser:", dbUser);
+  const userMutation = api.user.addUser.useMutation({});
+
+  useEffect(() => {
+    const addNewUser = async () => {
+      if (!didSaveUser && !dbUser && user && !isLoading && !error) {
+        setDidSaveUser(true);
+        const databaseUser: User =
+          authenticationService.generateUserByAuthenticationType(
+            user as Auth0User | FacebookUser
+          );
+
+        //@ts-ignore
+        await userMutation.mutateAsync(databaseUser);
+      }
+    };
+    void addNewUser();
+  }, [didSaveUser, dbUser, user, isLoading, error, userMutation]);
 
   return (
     <>
