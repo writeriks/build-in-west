@@ -15,7 +15,7 @@ const config = {
     // Feel free to reconfigure them to your own preference.
     "@typescript-eslint/array-type": "off",
     "@typescript-eslint/consistent-type-definitions": "off",
-    "@typescript-eslint/no-misused-promises": "off",
+    "@next/next/no-html-link-for-pages": "off",
 
     "@typescript-eslint/consistent-type-imports": [
       "warn",
