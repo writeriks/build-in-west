@@ -1,5 +1,10 @@
 import { type UserProfile } from "@auth0/nextjs-auth0/client";
 
+export interface Session {
+  accessToken: string;
+  user: Auth0User | FacebookUser;
+}
+
 export interface Auth0User extends UserProfile {
   sid: string;
   email: string;
@@ -22,6 +27,19 @@ export interface FacebookUser extends UserProfile {
   sid: string;
   sub: string;
   updated_at: string;
+}
+export interface GoogleUser extends UserProfile {
+  given_name: string;
+  family_name: string;
+  nickname: string;
+  name: string;
+  picture: string;
+  locale: string;
+  updated_at: string;
+  email: string;
+  email_verified: boolean;
+  sub: string;
+  sid: string;
 }
 
 export type DatabaseUser = Auth0User | FacebookUser | UserProfile;

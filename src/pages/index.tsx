@@ -1,37 +1,11 @@
-import { useUser } from "@auth0/nextjs-auth0/client";
 import Head from "next/head";
-import { api } from "../utils/api";
-import { useEffect, useState } from "react";
-import authenticationService from "../service/authentication-service.ts/authentication-service";
-import { type Auth0User, type FacebookUser } from "../types";
-import { type User } from "@prisma/client";
 
-export default function Home() {
-  const { user, error, isLoading } = useUser();
-  const [didSaveUser, setDidSaveUser] = useState(false);
+import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 
-  const { data: dbUser } = api.user.getUser.useQuery({
-    id: user?.sid as string,
-  });
-  console.log("🚀 ~ file: index.tsx:16 ~ Home ~ dbUser:", dbUser);
-  const userMutation = api.user.addUser.useMutation({});
+import { PrismaClient, type User } from "@prisma/client";
 
-  useEffect(() => {
-    const addNewUser = async () => {
-      if (!didSaveUser && !dbUser && user && !isLoading && !error) {
-        setDidSaveUser(true);
-        const databaseUser: User =
-          authenticationService.generateUserByAuthenticationType(
-            user as Auth0User | FacebookUser
-          );
-
-        //@ts-ignore
-        await userMutation.mutateAsync(databaseUser);
-      }
-    };
-    void addNewUser();
-  }, [didSaveUser, dbUser, user, isLoading, error, userMutation]);
-
+export const Home = ({ dbUser }: { dbUser: User }) => {
+  console.log("🚀 ~ file: index.tsx:8 ~ Home ~ dbUser:", dbUser);
   return (
     <>
       <Head>
@@ -40,7 +14,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center ">
-        {user?.email ? (
+        {dbUser ? (
           <a href="/api/auth/logout">Logout</a>
         ) : (
           <a href="/api/auth/login">Login</a>
@@ -48,4 +22,22 @@ export default function Home() {
       </main>
     </>
   );
-}
+};
+
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps({ req, res }) {
+    const session = await getSession(req, res);
+    const prisma = new PrismaClient();
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        email: session?.user.email as string,
+      },
+    });
+    await prisma.$disconnect();
+    return {
+      props: { dbUser: JSON.parse(JSON.stringify(dbUser)) as User },
+    };
+  },
+});
+
+export default Home;

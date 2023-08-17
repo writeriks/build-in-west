@@ -1,14 +1,11 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { UserType } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
-import { TRPCClientError } from "@trpc/client";
 
 export const userRouter = createTRPCRouter({
   addUser: publicProcedure
     .input(
       z.object({
-        id: z.string(),
         userType: z.enum([UserType.AUTH0, UserType.FACEBOOK, UserType.GOOGLE]),
         updated_at: z.string().optional(),
         email: z.string(),
@@ -21,11 +18,11 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.prisma.user.findUnique({
         where: {
-          id: input.id,
+          email: input.email,
         },
       });
 
-      if (user?.id) {
+      if (user?.email === input.email) {
         // User already exist. Do not save
         return;
       }
@@ -37,11 +34,11 @@ export const userRouter = createTRPCRouter({
       });
     }),
   getUser: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ email: z.string() }))
     .query(async ({ ctx, input }) => {
       return ctx.prisma.user.findUnique({
         where: {
-          id: input.id,
+          email: input.email,
         },
       });
     }),
