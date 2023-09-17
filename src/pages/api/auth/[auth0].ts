@@ -7,7 +7,7 @@ import { handleAuth, handleCallback } from "@auth0/nextjs-auth0";
 import { createUser } from "../../../utils/db";
 import authenticationService from "../../../service/authentication-service.ts/authentication-service";
 
-import { type Session } from "../../../types";
+import { type Session } from "../../../types/user-types";
 
 const afterCallback = async (
   req: any,

@@ -4,7 +4,7 @@ import {
   UserAuthenticationTypes,
   type FacebookUser,
   type GoogleUser,
-} from "../../types";
+} from "../../types/user-types";
 
 class AuthenticationService {
   generateUserByAuthenticationType = (
