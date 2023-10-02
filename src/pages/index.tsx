@@ -14,7 +14,12 @@ export const Home = ({ dbUser }: { dbUser: User }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center ">
-        {dbUser ? <a href="/api/auth/logout">Logout</a> : <a>Hello There</a>}
+        {dbUser && (
+          <div>
+            <h1 className="text-2xl font-bold">Welcome {dbUser.name}</h1>
+            <a href="/api/auth/logout">Logout</a>
+          </div>
+        )}
       </main>
     </>
   );
