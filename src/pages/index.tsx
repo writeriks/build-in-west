@@ -24,7 +24,7 @@ export const Home = ({ dbUser }: { dbUser: User }) => {
     </>
   );
 };
-
+// test
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps({ req, res }) {
     const session = await getSession(req, res);
