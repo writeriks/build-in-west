@@ -7,7 +7,7 @@ import "@/styles/globals.css";
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <UserProvider>
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
     </UserProvider>
   );
 };
