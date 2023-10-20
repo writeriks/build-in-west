@@ -26,7 +26,7 @@ class StockService {
 
       stocksArray.push({
         symbol: rowData[0]!.split(" ")[0]!,
-        name: rowData[0]!,
+        name: rowData[0]!.split(" ").splice(1)!.join(" ")!,
         lastPrice: rowData[2]!,
         change: rowData[3]!,
         volume: rowData[4]!,

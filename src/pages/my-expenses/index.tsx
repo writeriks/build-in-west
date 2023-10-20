@@ -1,14 +1,10 @@
-import React from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { type User } from "@prisma/client";
-import { api } from "../../utils/api";
+import React from "react";
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
 
-const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
-  console.log("🚀 ~ file: index.tsx:6 ~ MyPortfolio ~ dbUser:", dbUser);
-  const { data: stockData } = api.stocks.getStocks.useQuery();
-  console.log("🚀 ~ file: index.tsx:11 ~ Home ~ stockData:", stockData);
-
+const MyExpenses = ({ dbUser }: { dbUser: User }) => {
+  console.log("🚀 ~ file: index.tsx:6 ~ MyExpenses ~ dbUser:", dbUser);
   return (
     <div className="flex h-screen w-screen flex-col">
       <div className="h-16 h-full w-full bg-yellow-500">Content</div>
@@ -25,4 +21,4 @@ export const getServerSideProps = withPageAuthRequired({
   },
 });
 
-export default MyPortfolio;
+export default MyExpenses;

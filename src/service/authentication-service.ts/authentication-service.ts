@@ -1,10 +1,12 @@
-import { type User, UserType } from "@prisma/client";
+import { type User, UserType, PrismaClient } from "@prisma/client";
 import {
   type Auth0User,
   UserAuthenticationTypes,
   type FacebookUser,
   type GoogleUser,
 } from "../../types/user-types";
+import { getSession } from "@auth0/nextjs-auth0";
+import { type Request, type Response } from "../../types/http-types";
 
 class AuthenticationService {
   generateUserByAuthenticationType = (
@@ -60,6 +62,18 @@ class AuthenticationService {
       picture: user.picture,
       userType: UserType.GOOGLE,
     };
+  };
+
+  getUserWithSession = async (req: Request, res: Response) => {
+    const session = await getSession(req, res);
+    const prisma = new PrismaClient();
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        email: session?.user.email as string,
+      },
+    });
+    await prisma.$disconnect();
+    return dbUser;
   };
 }
 
