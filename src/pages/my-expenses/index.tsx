@@ -6,8 +6,8 @@ import authenticationService from "../../service/authentication-service.ts/authe
 const MyExpenses = ({ dbUser }: { dbUser: User }) => {
   console.log("🚀 ~ file: index.tsx:6 ~ MyExpenses ~ dbUser:", dbUser);
   return (
-    <div className="flex h-screen w-screen flex-col">
-      <div className="h-16 h-full w-full bg-yellow-500">Content</div>
+    <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
+      <div className=" h-full w-full bg-yellow-500">Content</div>
     </div>
   );
 };

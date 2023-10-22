@@ -2,6 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import uiReducerSelector from "../../store/reducers/ui-reducer/ui-reducer-selector";
 import { toggleHamburgerMenu } from "../../store/reducers/ui-reducer/ui-slice";
+import Image from "next/image";
 
 const NavigationBar = () => {
   const dispatch = useDispatch();
@@ -10,10 +11,15 @@ const NavigationBar = () => {
   );
 
   return (
-    <nav className="bg-gray-800 p-4">
+    <nav className="h-[60px] bg-red-800 p-4">
       <div className="container mx-auto flex items-center justify-between">
         <a href="/my-portfolio" className="text-white">
-          Your Logo
+          <Image
+            src="/assets/logo2.gif"
+            alt="Your Image"
+            width={100}
+            height={30}
+          />
         </a>
 
         {/* Hamburger menu for mobile */}
@@ -52,13 +58,13 @@ const NavigationBar = () => {
         </div>
 
         <div className={`hidden space-x-4 md:flex`}>
-          <a href="/my-portfolio" className="text-white">
+          <a href="/my-portfolio" className="text-md text-white">
             My Portfolio
           </a>
-          <a href="/my-expenses" className="text-white">
+          <a href="/my-expenses" className="text-md text-white">
             My Expenses
           </a>
-          <a href="/api/auth/logout" className="text-white">
+          <a href="/api/auth/logout" className="text-md text-white">
             Logout
           </a>
         </div>

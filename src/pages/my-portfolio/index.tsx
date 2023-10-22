@@ -10,7 +10,7 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
   console.log("🚀 ~ file: index.tsx:11 ~ Home ~ stockData:", stockData);
 
   return (
-    <div className="flex h-screen w-screen flex-col">
+    <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
       <div className="h-16 h-full w-full bg-yellow-500">Content</div>
     </div>
   );
