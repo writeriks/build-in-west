@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 import NavigationBar from "../componenets/navigation-bar/navigation-bar";
+import SideBar from "../componenets/side-bar/side-bar";
+import { useSelector } from "react-redux";
+import uiReducerSelector from "../store/reducers/ui-reducer/ui-reducer-selector";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -12,11 +15,18 @@ interface MainLayoutProps {
   };
 }
 
-const MainLayout = (props: MainLayoutProps) => (
-  <div className="mx-auto flex min-h-screen w-screen flex-col">
-    <NavigationBar />
-    {props.children}
-  </div>
-);
+const MainLayout = (props: MainLayoutProps) => {
+  const isHamburgerMenuOpen = useSelector(
+    uiReducerSelector.getIsHamburgerMenuOpen
+  );
+
+  return (
+    <div className="mx-auto flex min-h-screen w-screen flex-col">
+      <SideBar isHamburgerMenuOpen={isHamburgerMenuOpen} />
+      <NavigationBar />
+      {props.children}
+    </div>
+  );
+};
 
 export default MainLayout;

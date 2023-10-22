@@ -1,20 +1,14 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import uiReducerSelector from "../../store/reducers/ui-reducer/ui-reducer-selector";
+import { toggleHamburgerMenu } from "../../store/reducers/ui-reducer/ui-slice";
 
 const NavigationBar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const dispatch = useDispatch();
   const isHamburgerMenuOpen = useSelector(
     uiReducerSelector.getIsHamburgerMenuOpen
   );
-  console.log(
-    "🚀 ~ file: navigation-bar.tsx:10 ~ NavigationBar ~ isHamburgerMenuOpen:",
-    isHamburgerMenuOpen
-  );
 
-  const toggleMenu = () => {
-    setIsMenuOpen((prevState) => !prevState);
-  };
   return (
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex items-center justify-between">
@@ -27,18 +21,18 @@ const NavigationBar = () => {
           <button
             title="hamburger menu"
             className="transform text-white transition duration-300 ease-in-out"
-            onClick={toggleMenu}
+            onClick={() => dispatch(toggleHamburgerMenu())}
           >
             <svg
               className={`h-6 w-6 transform transition-transform ${
-                isMenuOpen ? "-rotate-90" : ""
+                isHamburgerMenuOpen ? "-rotate-90" : ""
               }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {isMenuOpen ? (
+              {isHamburgerMenuOpen ? (
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
