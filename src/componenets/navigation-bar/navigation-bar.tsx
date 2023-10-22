@@ -1,7 +1,16 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import uiReducerSelector from "../../store/reducers/ui-reducer/ui-reducer-selector";
 
 const NavigationBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isHamburgerMenuOpen = useSelector(
+    uiReducerSelector.getIsHamburgerMenuOpen
+  );
+  console.log(
+    "🚀 ~ file: navigation-bar.tsx:10 ~ NavigationBar ~ isHamburgerMenuOpen:",
+    isHamburgerMenuOpen
+  );
 
   const toggleMenu = () => {
     setIsMenuOpen((prevState) => !prevState);
