@@ -1,10 +1,10 @@
 import React from "react";
 
-interface SideBarProps {
+interface SideBarMenuProps {
   isHamburgerMenuOpen: boolean;
 }
 
-const SideBar: React.FC<SideBarProps> = ({ isHamburgerMenuOpen }) => (
+const SideBarMenu: React.FC<SideBarMenuProps> = ({ isHamburgerMenuOpen }) => (
   <div
     className={`fixed right-0 top-0 h-screen w-64 transform bg-red-800 transition-transform ease-in-out ${
       isHamburgerMenuOpen ? "translate-x-0" : "translate-x-64"
@@ -30,4 +30,4 @@ const SideBar: React.FC<SideBarProps> = ({ isHamburgerMenuOpen }) => (
   </div>
 );
 
-export default SideBar;
+export default SideBarMenu;
