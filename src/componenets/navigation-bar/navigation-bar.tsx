@@ -23,7 +23,7 @@ const NavigationBar = () => {
         </a>
 
         {/* Hamburger menu for mobile */}
-        <div className="md:hidden">
+        <div className="z-50 md:hidden">
           <button
             title="hamburger menu"
             className="transform text-white transition duration-300 ease-in-out"

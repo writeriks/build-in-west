@@ -17,6 +17,7 @@ const config = {
     "@typescript-eslint/consistent-type-definitions": "off",
     "@next/next/no-html-link-for-pages": "off",
     "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-misused-promises": "off",
 
     "@typescript-eslint/consistent-type-imports": [
       "warn",
