@@ -149,7 +149,11 @@ const Table: React.FC<TableProps> = ({ isSelectable, onSortFinished }) => {
         </tbody>
       </table>
       <div className="flex justify-center">
-        <Pagination />
+        <Pagination
+          count={3}
+          page={2}
+          onChange={() => console.log("prev or next")}
+        />
       </div>
     </div>
   );
