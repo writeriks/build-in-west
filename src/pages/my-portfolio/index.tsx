@@ -14,7 +14,7 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
     <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
       <div className="h-16 h-full w-full bg-yellow-500 p-4">
         <h1>My Portfolio</h1>
-        <Table handleSortDone={async () => await console.log("TEST")} />
+        <Table />
       </div>
     </div>
   );
