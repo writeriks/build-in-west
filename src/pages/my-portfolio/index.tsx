@@ -14,7 +14,11 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
     <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
       <div className="h-16 h-full w-full bg-yellow-500 p-4">
         <h1>My Portfolio</h1>
-        <Table />
+        <div className="flex w-full flex-row justify-center">
+          <div className="md:w-[70%]">
+            <Table />
+          </div>
+        </div>
       </div>
     </div>
   );

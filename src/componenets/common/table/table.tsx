@@ -6,22 +6,22 @@ interface TableProps {
   isSelectable?: boolean;
   headers?: unknown[];
   data?: unknown[];
-  handleSortDone?: () => Promise<void>;
+  onSortFinished?: () => Promise<void>;
 }
 
-const Table: React.FC<TableProps> = ({ isSelectable, handleSortDone }) => {
+const Table: React.FC<TableProps> = ({ isSelectable, onSortFinished }) => {
   const [isSort, setIsSort] = useState(false);
 
   const handleSort = async (isSort: boolean) => {
-    if (isSort && handleSortDone) {
+    if (isSort && onSortFinished) {
       console.log("Save");
-      await handleSortDone();
+      await onSortFinished();
     }
     setIsSort(!isSort);
   };
 
   return (
-    <div className="relative overflow-x-auto p-2 shadow-md sm:rounded-lg">
+    <div className="relative w-full overflow-x-auto p-2 shadow-md sm:rounded-lg">
       <div className="flex flex-row justify-between ">
         <SearchBar id="table-search" />
         <button
@@ -58,11 +58,16 @@ const Table: React.FC<TableProps> = ({ isSelectable, handleSortDone }) => {
             <th scope="col" className="px-3 py-1 md:px-6 md:py-3">
               Change %
             </th>
-            {isSort ? (
-              <th scope="col" className="px-3 py-1 md:px-6 md:py-3">
-                Action
-              </th>
-            ) : null}
+            <th
+              scope="col"
+              className={`${
+                isSort
+                  ? "transition-width w-0 overflow-hidden p-0 px-3 py-1 opacity-100 transition-opacity duration-500 duration-500 md:px-6 md:py-3"
+                  : "w-0 opacity-0"
+              }`}
+            >
+              {isSort ? "Action" : ""}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -84,55 +89,68 @@ const Table: React.FC<TableProps> = ({ isSelectable, handleSortDone }) => {
 
             <th
               scope="row"
-              className="whitespace-nowrap px-3 py-1  font-medium text-gray-900 dark:text-white  md:px-6 md:py-4"
+              className="whitespace-nowrap px-3 py-1 font-medium text-gray-900 dark:text-white md:px-6 md:py-4"
             >
               Apple
             </th>
             <td className="px-3 py-1 md:px-6 md:py-4">Silver</td>
             <td className="px-3 py-1 md:px-6 md:py-4">Laptop</td>
-            {isSort ? (
-              <td className="flex flex-row px-3 py-1 md:px-6 md:py-4">
-                <button type="button" title="drag" className="cursor-move">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="h-4 w-4 text-gray-800 dark:text-white"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                </button>
-                <div className="md:w-full"></div>
-                <button type="button" title="delete">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="h-4 w-4 text-gray-800 dark:text-white"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </td>
-            ) : null}
+            <td
+              className={`${
+                isSort
+                  ? "transition-width overflow-hidden opacity-100 transition-opacity duration-500 duration-500"
+                  : "w-0 opacity-0"
+              } `}
+            >
+              {isSort ? (
+                <div className="flex flex-row justify-end px-1 py-1 md:py-3">
+                  <button type="button" title="drag" className="cursor-move">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      className="h-4 w-4 text-gray-800 dark:text-white md:h-6 md:w-6"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Spacer */}
+                  <div className="w-2" />
+
+                  <button type="button" title="delete">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      className="h-4 w-4 text-gray-800 dark:text-white md:h-6 md:w-6"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ) : null}
+            </td>
           </tr>
         </tbody>
       </table>
-      <Pagination />
+      <div className="flex justify-center">
+        <Pagination />
+      </div>
     </div>
   );
 };
