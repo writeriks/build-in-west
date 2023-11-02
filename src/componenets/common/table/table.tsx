@@ -1,16 +1,43 @@
-import React, { useState } from "react";
+import React, { useDeferredValue, useMemo, useState } from "react";
 import SearchBar from "../search-bar/search-bar";
 import Pagination from "../pagination/pagination";
+import { type Stock } from "../../../types/stock-types";
 
 interface TableProps {
   isSelectable?: boolean;
-  headers?: unknown[];
-  data?: unknown[];
+  headers?: string[];
+  data: Stock[];
   onSortFinished?: () => Promise<void>;
 }
 
-const Table: React.FC<TableProps> = ({ isSelectable, onSortFinished }) => {
+const Table: React.FC<TableProps> = ({
+  isSelectable,
+  onSortFinished,
+  data,
+}) => {
   const [isSort, setIsSort] = useState(false);
+  const [searchLabel, setSearchLabel] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const deferredSearchLabel = useDeferredValue(searchLabel);
+
+  const pageCount = useMemo(() => Math.ceil(data.length / 30), [data]);
+  const filteredList = useMemo(
+    () =>
+      data.filter(
+        (item) =>
+          item.symbol.toUpperCase().includes(searchLabel.toUpperCase()) ||
+          item.name.toUpperCase().includes(searchLabel.toUpperCase())
+      ),
+    [searchLabel, data]
+  );
+
+  const paginatedList = useMemo(
+    () => filteredList.slice((pageNumber - 1) * 30, pageNumber * 30),
+    [pageNumber, filteredList]
+  );
+
+  console.log("🚀 ~ file: table.tsx:31 ~ filteredList:", filteredList);
+  console.log("🚀 ~ file: table.tsx:38 ~ paginatedList:", paginatedList);
 
   const handleSort = async (isSort: boolean) => {
     if (isSort && onSortFinished) {
@@ -23,7 +50,13 @@ const Table: React.FC<TableProps> = ({ isSelectable, onSortFinished }) => {
   return (
     <div className="relative w-full overflow-x-auto p-2 shadow-md sm:rounded-lg">
       <div className="flex flex-row justify-between ">
-        <SearchBar id="table-search" />
+        <SearchBar
+          id="table-search"
+          value={deferredSearchLabel}
+          onChange={({ target }: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchLabel(target.value)
+          }
+        />
         <button
           onClick={async () => await handleSort(isSort)}
           type="button"
@@ -150,9 +183,9 @@ const Table: React.FC<TableProps> = ({ isSelectable, onSortFinished }) => {
       </table>
       <div className="flex justify-center">
         <Pagination
-          count={3}
-          page={2}
-          onChange={() => console.log("prev or next")}
+          count={pageCount}
+          pageNumber={pageNumber}
+          onPageChange={(value: number) => setPageNumber(value)}
         />
       </div>
     </div>

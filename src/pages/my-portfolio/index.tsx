@@ -7,8 +7,10 @@ import Table from "../../componenets/common/table/table";
 
 const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
   console.log("🚀 ~ file: index.tsx:6 ~ MyPortfolio ~ dbUser:", dbUser);
-  const { data: stockData } = api.stocks.getStocks.useQuery();
-  console.log("🚀 ~ file: index.tsx:11 ~ Home ~ stockData:", stockData);
+  const { data: stockData, isLoading, error } = api.stocks.getStocks.useQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>error</div>;
 
   return (
     <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
@@ -16,7 +18,11 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
         <h1>My Portfolio</h1>
         <div className="flex w-full flex-row justify-center">
           <div className="md:w-[70%]">
-            <Table />
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : (
+              <Table data={Object.values(stockData)} />
+            )}
           </div>
         </div>
       </div>
