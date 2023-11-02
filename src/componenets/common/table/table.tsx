@@ -2,16 +2,19 @@ import React, { useDeferredValue, useMemo, useState } from "react";
 import SearchBar from "../search-bar/search-bar";
 import Pagination from "../pagination/pagination";
 import { type Stock } from "../../../types/stock-types";
+import TableRow from "./table-row";
 
 interface TableProps {
   isSelectable?: boolean;
-  headers?: string[];
+  headers: string[];
   data: Stock[];
   onSortFinished?: () => Promise<void>;
 }
 
+const PAGE_SIZE = 10;
 const Table: React.FC<TableProps> = ({
   isSelectable,
+  headers,
   onSortFinished,
   data,
 }) => {
@@ -20,7 +23,7 @@ const Table: React.FC<TableProps> = ({
   const [pageNumber, setPageNumber] = useState(1);
   const deferredSearchLabel = useDeferredValue(searchLabel);
 
-  const pageCount = useMemo(() => Math.ceil(data.length / 30), [data]);
+  const pageCount = useMemo(() => Math.ceil(data.length / PAGE_SIZE), [data]);
   const filteredList = useMemo(
     () =>
       data.filter(
@@ -32,11 +35,11 @@ const Table: React.FC<TableProps> = ({
   );
 
   const paginatedList = useMemo(
-    () => filteredList.slice((pageNumber - 1) * 30, pageNumber * 30),
+    () =>
+      filteredList.slice((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE),
     [pageNumber, filteredList]
   );
 
-  console.log("🚀 ~ file: table.tsx:31 ~ filteredList:", filteredList);
   console.log("🚀 ~ file: table.tsx:38 ~ paginatedList:", paginatedList);
 
   const handleSort = async (isSort: boolean) => {
@@ -82,15 +85,13 @@ const Table: React.FC<TableProps> = ({
                 </div>
               </th>
             ) : null}
-            <th scope="col" className="px-3 py-1 md:px-6 md:py-3">
-              Symbol
-            </th>
-            <th scope="col" className="px-3 py-1 md:px-6 md:py-3">
-              Price
-            </th>
-            <th scope="col" className="px-3 py-1 md:px-6 md:py-3">
-              Change %
-            </th>
+
+            {headers.map((header, index) => (
+              <th scope="col" key={index} className="px-3 py-1 md:px-6 md:py-3">
+                {header}
+              </th>
+            ))}
+
             <th
               scope="col"
               className={`${
@@ -104,81 +105,13 @@ const Table: React.FC<TableProps> = ({
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600">
-            {isSelectable ? (
-              <td className="w-4 p-4">
-                <div className="flex items-center">
-                  <input
-                    id="checkbox-table-search-1"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                  />
-                  <label htmlFor="checkbox-table-search-1" className="sr-only">
-                    checkbox
-                  </label>
-                </div>
-              </td>
-            ) : null}
-
-            <th
-              scope="row"
-              className="whitespace-nowrap px-3 py-1 font-medium text-gray-900 dark:text-white md:px-6 md:py-4"
-            >
-              Apple
-            </th>
-            <td className="px-3 py-1 md:px-6 md:py-4">Silver</td>
-            <td className="px-3 py-1 md:px-6 md:py-4">Laptop</td>
-            <td
-              className={`${
-                isSort
-                  ? "transition-width overflow-hidden opacity-100 transition-opacity duration-500 duration-500"
-                  : "w-0 opacity-0"
-              } `}
-            >
-              {isSort ? (
-                <div className="flex flex-row justify-end px-1 py-1 md:py-3">
-                  <button type="button" title="drag" className="cursor-move">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="h-4 w-4 text-gray-800 dark:text-white md:h-6 md:w-6"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 6h16M4 12h16M4 18h16"
-                      />
-                    </svg>
-                  </button>
-
-                  {/* Spacer */}
-                  <div className="w-2" />
-
-                  <button type="button" title="delete">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="h-4 w-4 text-gray-800 dark:text-white md:h-6 md:w-6"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ) : null}
-            </td>
-          </tr>
+          {!!searchLabel
+            ? filteredList
+                .slice(0, PAGE_SIZE)
+                .map((item, index) => <TableRow key={index} item={item} />)
+            : paginatedList.map((item, index) => (
+                <TableRow key={index} item={item} />
+              ))}
         </tbody>
       </table>
       <div className="flex justify-center">

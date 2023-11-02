@@ -12,16 +12,18 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>error</div>;
 
+  const headers = ["Name", "Price", "Change %"];
+
   return (
     <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
       <div className="h-16 h-full w-full bg-yellow-500 p-4">
         <h1>My Portfolio</h1>
         <div className="flex w-full flex-row justify-center">
-          <div className="md:w-[70%]">
+          <div className="w-full md:w-[70%]">
             {isLoading ? (
               <div>Loading...</div>
             ) : (
-              <Table data={Object.values(stockData)} />
+              <Table data={Object.values(stockData)} headers={headers} />
             )}
           </div>
         </div>
