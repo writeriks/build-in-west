@@ -3,7 +3,7 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { type User } from "@prisma/client";
 import { api } from "../../utils/api";
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
-import Table from "../../componenets/common/table/table";
+import StockTable from "../../componenets/stocks-table/stock-table";
 
 const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
   console.log("🚀 ~ file: index.tsx:6 ~ MyPortfolio ~ dbUser:", dbUser);
@@ -12,7 +12,7 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>error</div>;
 
-  const headers = ["Name", "Price", "Change %"];
+  const tableHeaders = ["Symbol - Name", "Price", "Change %"];
 
   return (
     <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
@@ -23,7 +23,10 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
             {isLoading ? (
               <div>Loading...</div>
             ) : (
-              <Table data={Object.values(stockData)} headers={headers} />
+              <StockTable
+                data={Object.values(stockData)}
+                headers={tableHeaders}
+              />
             )}
           </div>
         </div>
