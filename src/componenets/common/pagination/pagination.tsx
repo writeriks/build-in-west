@@ -6,6 +6,12 @@ interface PaginationProps {
   pageNumber: number;
 }
 
+/*
+  Pagination component
+  @param count: The total number of pages
+  @param onPageChange: The function to call when a page is clicked
+  @param pageNumber: The current page number
+*/
 const Pagination: React.FC<PaginationProps> = ({
   count,
   onPageChange,
