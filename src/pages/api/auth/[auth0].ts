@@ -16,7 +16,6 @@ const afterCallback = async (
   state: any
 ) => {
   const { user } = session;
-  console.log("🚀 ~ file: [auth0].ts:19 ~ user:", user);
   const dbUser = authenticationService.generateUserByAuthenticationType(user);
   try {
     await createUser(dbUser);
