@@ -6,7 +6,7 @@ import authenticationService from "../../service/authentication-service.ts/authe
 import StockTable from "../../componenets/stocks-table/stock-table";
 
 const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
-  console.log("🚀 ~ file: index.tsx:6 ~ MyPortfolio ~ dbUser:", dbUser);
+  console.log("🚀 ~ file: index.tsx:19 ~ dbUser:", dbUser);
   const { data: stockData, isLoading, error } = api.stocks.getStocks.useQuery();
 
   if (isLoading) return <div>Loading...</div>;
@@ -20,14 +20,10 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
         <h1>My Portfolio</h1>
         <div className="flex w-full flex-row justify-center">
           <div className="w-full md:w-[70%]">
-            {isLoading ? (
-              <div>Loading...</div>
-            ) : (
-              <StockTable
-                data={Object.values(stockData)}
-                headers={tableHeaders}
-              />
-            )}
+            <StockTable
+              data={Object.values(stockData)}
+              headers={tableHeaders}
+            />
           </div>
         </div>
       </div>
@@ -36,10 +32,24 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
 };
 
 export const getServerSideProps = withPageAuthRequired({
-  async getServerSideProps({ req, res }) {
+  async getServerSideProps(context) {
+    const { req, res } = context;
+
+    // A way to call trpc methods from the server
+    /* const ctx = createTRPCContext({
+      req: req as NextApiRequest,
+      res: res as NextApiResponse,
+    });
+    const trpc = appRouter.createCaller(ctx);
+
+    const stocks = await trpc.stocks.getStocks(); */
+
     const dbUser = await authenticationService.getUserWithSession(req, res);
     return {
-      props: { dbUser: JSON.parse(JSON.stringify(dbUser)) as User },
+      props: {
+        dbUser: JSON.parse(JSON.stringify(dbUser)) as User,
+        /* stocks: stocks, */
+      },
     };
   },
 });
