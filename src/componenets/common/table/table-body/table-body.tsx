@@ -1,11 +1,15 @@
 import React from "react";
 import TableRow from "../table-row/table-row";
 import { TableStockCells } from "../../../table-stock-cells/table-stock-cells";
+
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 import { type Stock } from "../../../../types/stock-types";
 
 interface TableBodyProps {
   isSelectable?: boolean;
-  isSort: boolean;
+  isEdit: boolean;
   filteredList: Stock[];
   paginatedList: Stock[];
   pageSize: number;
@@ -15,7 +19,7 @@ interface TableBodyProps {
 const TableBody: React.FC<TableBodyProps> = ({
   filteredList,
   isSelectable,
-  isSort,
+  isEdit,
   pageSize,
   paginatedList,
   searchLabel,
@@ -28,7 +32,7 @@ const TableBody: React.FC<TableBodyProps> = ({
             <TableRow
               isSelectable={isSelectable}
               key={index}
-              isEdit={isSort}
+              isEdit={isEdit}
               cellStyles={TableStockCells(item)}
             />
           ))
@@ -36,7 +40,7 @@ const TableBody: React.FC<TableBodyProps> = ({
           <TableRow
             isSelectable={isSelectable}
             key={index}
-            isEdit={isSort}
+            isEdit={isEdit}
             cellStyles={TableStockCells(item)}
           />
         ))}

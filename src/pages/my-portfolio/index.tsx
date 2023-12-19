@@ -1,16 +1,24 @@
 import React from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { type User } from "@prisma/client";
-import { api } from "../../utils/api";
+
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
 import StockTable from "../../componenets/stocks-table/stock-table";
 
-const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
-  console.log("🚀 ~ file: index.tsx:19 ~ dbUser:", dbUser);
-  const { data: stockData, isLoading, error } = api.stocks.getStocks.useQuery();
+import { createTRPCContext } from "../../server/api/trpc";
+import { appRouter } from "../../server/api/root";
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>error</div>;
+import { type Stock } from "../../types/stock-types";
+import { type NextApiRequest, type NextApiResponse } from "next";
+import { type User } from "@prisma/client";
+
+const MyPortfolio = ({
+  dbUser,
+  stocks: stockData,
+}: {
+  dbUser: User;
+  stocks: Record<string, Stock>;
+}) => {
+  console.log("🚀 ~ file: index.tsx:19 ~ dbUser:", dbUser);
 
   const tableHeaders = ["Symbol - Name", "Price", "Change %"];
 
@@ -23,6 +31,7 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
             <StockTable
               data={Object.values(stockData)}
               headers={tableHeaders}
+              isEditable
             />
           </div>
         </div>
@@ -36,19 +45,18 @@ export const getServerSideProps = withPageAuthRequired({
     const { req, res } = context;
 
     // A way to call trpc methods from the server
-    /* const ctx = createTRPCContext({
+    const ctx = createTRPCContext({
       req: req as NextApiRequest,
       res: res as NextApiResponse,
     });
     const trpc = appRouter.createCaller(ctx);
-
-    const stocks = await trpc.stocks.getStocks(); */
+    const stocks = await trpc.stocks.getStocks();
 
     const dbUser = await authenticationService.getUserWithSession(req, res);
     return {
       props: {
         dbUser: JSON.parse(JSON.stringify(dbUser)) as User,
-        /* stocks: stocks, */
+        stocks: stocks,
       },
     };
   },

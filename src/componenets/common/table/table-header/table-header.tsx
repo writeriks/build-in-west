@@ -2,13 +2,13 @@ import React from "react";
 
 interface TableHeaderProps {
   isSelectable?: boolean;
-  isSort?: boolean;
+  isEdit?: boolean;
   headers: string[];
 }
 
 const TableHeader: React.FC<TableHeaderProps> = ({
   isSelectable,
-  isSort,
+  isEdit,
   headers,
 }) => {
   return (
@@ -38,12 +38,12 @@ const TableHeader: React.FC<TableHeaderProps> = ({
         <th
           scope="col"
           className={`${
-            isSort
+            isEdit
               ? "transition-width w-0 overflow-hidden p-0 px-3 py-1 opacity-100 transition-opacity duration-500 duration-500 md:px-6 md:py-3"
               : "w-0 opacity-0"
           }`}
         >
-          {isSort ? "Action" : ""}
+          {isEdit ? "Action" : ""}
         </th>
       </tr>
     </thead>

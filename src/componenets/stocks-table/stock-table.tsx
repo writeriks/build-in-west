@@ -18,6 +18,7 @@ interface TableProps {
   data: Stock[];
   onSortFinished?: () => Promise<void>;
   cellStyles?: ReactNode[];
+  isEditable?: boolean;
 }
 
 const PAGE_SIZE = 10;
@@ -26,8 +27,9 @@ const StockTable: React.FC<TableProps> = ({
   headers,
   onSortFinished,
   data,
+  isEditable,
 }) => {
-  const [isSort, setIsSort] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [searchLabel, setSearchLabel] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const deferredSearchLabel = useDeferredValue(searchLabel);
@@ -49,12 +51,12 @@ const StockTable: React.FC<TableProps> = ({
     [pageNumber, filteredList]
   );
 
-  const handleSort = async (isSort: boolean) => {
-    if (isSort && onSortFinished) {
+  const handleEdit = async (isEdit: boolean) => {
+    if (isEdit && onSortFinished) {
       console.log("Saved");
       await onSortFinished();
     }
-    setIsSort(!isSort);
+    setIsEdit(!isEdit);
   };
 
   return (
@@ -67,26 +69,29 @@ const StockTable: React.FC<TableProps> = ({
             setSearchLabel(target.value)
           }
         />
-        <button
-          onClick={async () => await handleSort(isSort)}
-          type="button"
-          className="mb-4 mr-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
-        >
-          {isSort ? "Done" : "Sort"}
-        </button>
+
+        {isEditable ? (
+          <button
+            onClick={async () => await handleEdit(isEdit)}
+            type="button"
+            className="mb-4 mr-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+          >
+            {isEdit ? "Done" : "Sort"}
+          </button>
+        ) : null}
       </div>
       <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
         <TableHeader
-          headers={headers}
           isSelectable={isSelectable}
-          isSort={isSort}
+          isEdit={isEdit}
+          headers={headers}
         />
         <TableBody
           filteredList={filteredList}
           paginatedList={paginatedList}
           searchLabel={searchLabel}
           pageSize={PAGE_SIZE}
-          isSort={isSort}
+          isEdit={isEdit}
           isSelectable={isSelectable}
         />
       </table>
