@@ -16,7 +16,6 @@ interface TableProps {
   isSelectable?: boolean;
   headers: string[];
   data: Stock[];
-  onSortFinished?: () => Promise<void>;
   cellStyles?: ReactNode[];
   isEditable?: boolean;
 }
@@ -25,36 +24,26 @@ const PAGE_SIZE = 10;
 const StockTable: React.FC<TableProps> = ({
   isSelectable,
   headers,
-  onSortFinished,
   data,
   isEditable,
 }) => {
+  const [stocksData, setStocksData] = useState(data);
   const [isEdit, setIsEdit] = useState(false);
   const [searchLabel, setSearchLabel] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const deferredSearchLabel = useDeferredValue(searchLabel);
 
-  const pageCount = useMemo(() => Math.ceil(data.length / PAGE_SIZE), [data]);
-  const filteredList = useMemo(
-    () =>
-      data.filter(
-        (item) =>
-          item.symbol.toUpperCase().includes(searchLabel.toUpperCase()) ||
-          item.name.toUpperCase().includes(searchLabel.toUpperCase())
-      ),
-    [searchLabel, data]
+  const pageCount = useMemo(
+    () => Math.ceil(stocksData.length / PAGE_SIZE),
+    [stocksData]
   );
 
-  const paginatedList = useMemo(
-    () =>
-      filteredList.slice((pageNumber - 1) * PAGE_SIZE, pageNumber * PAGE_SIZE),
-    [pageNumber, filteredList]
-  );
-
-  const handleEdit = async (isEdit: boolean) => {
-    if (isEdit && onSortFinished) {
+  const handleEdit = (isEdit: boolean) => {
+    console.log("🚀 ~ file: stock-table.tsx:55 ~ handleEdit ~ isEdit:", isEdit);
+    if (isEdit) {
       console.log("Saved");
-      await onSortFinished();
+      console.log("🚀 ~ file: stock-table.tsx:33 ~ stocksData:", stocksData);
+      // TODO: Save stocksData to DB
     }
     setIsEdit(!isEdit);
   };
@@ -72,7 +61,7 @@ const StockTable: React.FC<TableProps> = ({
 
         {isEditable ? (
           <button
-            onClick={async () => await handleEdit(isEdit)}
+            onClick={() => handleEdit(isEdit)}
             type="button"
             className="mb-4 mr-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
           >
@@ -87,12 +76,13 @@ const StockTable: React.FC<TableProps> = ({
           headers={headers}
         />
         <TableBody
-          filteredList={filteredList}
-          paginatedList={paginatedList}
+          data={stocksData}
+          setData={setStocksData}
           searchLabel={searchLabel}
           pageSize={PAGE_SIZE}
           isEdit={isEdit}
           isSelectable={isSelectable}
+          pageNumber={pageNumber}
         />
       </table>
       <div className="flex justify-center">

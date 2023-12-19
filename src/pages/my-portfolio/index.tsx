@@ -10,6 +10,7 @@ import { appRouter } from "../../server/api/root";
 import { type Stock } from "../../types/stock-types";
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { type User } from "@prisma/client";
+import StocksModal from "../../componenets/stocks-modal/stocks-modal";
 
 const MyPortfolio = ({
   dbUser,
@@ -20,14 +21,25 @@ const MyPortfolio = ({
 }) => {
   console.log("🚀 ~ file: index.tsx:19 ~ dbUser:", dbUser);
 
+  const [isModal, setIsModal] = React.useState(false);
+  console.log("🚀 ~ file: index.tsx:25 ~ isModal:", isModal);
+
   const tableHeaders = ["Symbol - Name", "Price", "Change %"];
 
   return (
     <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
       <div className="h-16 h-full w-full bg-yellow-500 p-4">
         <h1>My Portfolio</h1>
+        {isModal ? <StocksModal isModal setIsModal={setIsModal} /> : null}
         <div className="flex w-full flex-row justify-center">
           <div className="w-full md:w-[70%]">
+            <button
+              type="button"
+              className="mb-2 me-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+              onClick={() => setIsModal(!isModal)}
+            >
+              Add Stock
+            </button>
             <StockTable
               data={Object.values(stockData)}
               headers={tableHeaders}

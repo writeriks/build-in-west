@@ -25,6 +25,7 @@ class StockService {
       });
 
       stocksArray.push({
+        id: rowData[0]!.split(" ")[0]!,
         symbol: rowData[0]!.split(" ")[0]!,
         name: rowData[0]!.split(" ").splice(1)!.join(" ")!,
         lastPrice: rowData[2]!,

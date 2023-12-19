@@ -5,6 +5,7 @@ export interface Stock {
   volume: string;
   lastUpdate: string;
   change: string;
+  id: string;
 }
 
 export type StockData = Record<string, Stock>;
