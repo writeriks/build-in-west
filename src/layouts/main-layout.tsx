@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import NavigationBar from "../componenets/navigation-bar/navigation-bar";
 import SideBarMenu from "../componenets/side-bar-menu/side-bar-menu";
 import { useSelector } from "react-redux";

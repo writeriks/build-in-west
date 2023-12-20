@@ -3,12 +3,18 @@ import { useDispatch, useSelector } from "react-redux";
 import uiReducerSelector from "../../store/reducers/ui-reducer/ui-reducer-selector";
 import { toggleHamburgerMenu } from "../../store/reducers/ui-reducer/ui-slice";
 import Image from "next/image";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 const NavigationBar = () => {
   const dispatch = useDispatch();
   const isHamburgerMenuOpen = useSelector(
     uiReducerSelector.getIsHamburgerMenuOpen
   );
+
+  const { user, isLoading, error } = useUser();
+  console.log("🚀 ~ file: navigation-bar.tsx:14 ~ NavigationBar ~ user:", user);
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
 
   return (
     <nav className="h-[60px] bg-red-800 p-4">
@@ -58,6 +64,9 @@ const NavigationBar = () => {
         </div>
 
         <div className={`hidden space-x-4 md:flex`}>
+          <a href="/my-portfolio" className="text-md text-white">
+            {user?.name}
+          </a>
           <a href="/my-portfolio" className="text-md text-white">
             My Portfolio
           </a>

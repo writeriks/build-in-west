@@ -14,7 +14,6 @@ import { type Stock } from "../../types/stock-types";
 
 interface TableProps {
   isSelectable?: boolean;
-  headers: string[];
   data: Stock[];
   cellStyles?: ReactNode[];
   isEditable?: boolean;
@@ -23,7 +22,6 @@ interface TableProps {
 const PAGE_SIZE = 10;
 const StockTable: React.FC<TableProps> = ({
   isSelectable,
-  headers,
   data,
   isEditable,
 }) => {
@@ -32,6 +30,8 @@ const StockTable: React.FC<TableProps> = ({
   const [searchLabel, setSearchLabel] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const deferredSearchLabel = useDeferredValue(searchLabel);
+
+  const headers = ["Symbol - Name", "Price", "Change %"];
 
   const pageCount = useMemo(
     () => Math.ceil(stocksData.length / PAGE_SIZE),
