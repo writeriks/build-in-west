@@ -12,14 +12,28 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  userType       UserType?
-  updated_at     DateTime? @default(now())
-  email          String    @unique
-  email_verified Boolean?  @default(false)
-  name           String?   @db.VarChar(255)
-  lastname       String?   @db.VarChar(255)
+  id             String      @id @default(cuid())
+  userType       UserType
+  updated_at     DateTime?   @default(now())
+  email          String      @unique
+  email_verified Boolean?    @default(false)
+  name           String?     @db.VarChar(255)
+  lastname       String?     @db.VarChar(255)
   picture        String?
+  userStocks     UserStock[]
+}
+
+model UserStock {
+  id         String    @id @default(cuid())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String
+  name       String
+  symbol     String    @unique
+  buyPrice   Float
+  quantity   Int
+  updated_at DateTime? @default(now())
+
+  @@index([userId])
 }
 
 enum UserType {

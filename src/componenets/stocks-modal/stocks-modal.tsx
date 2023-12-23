@@ -1,4 +1,6 @@
 import React from "react";
+import StockTable from "../stocks-table/stock-table";
+import { api } from "../../utils/api";
 
 interface StocksModalProps {
   isModal: boolean;
@@ -6,7 +8,11 @@ interface StocksModalProps {
 }
 
 const StocksModal: React.FC<StocksModalProps> = ({ setIsModal, isModal }) => {
+  const { data: stockData, isLoading, error } = api.stocks.getStocks.useQuery();
   console.log("🚀 ~ file: stocks-modal.tsx:9 ~ isModal:", isModal);
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
+
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 top-0 z-10 flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-gray-700 opacity-75"></div>
@@ -46,6 +52,7 @@ const StocksModal: React.FC<StocksModalProps> = ({ setIsModal, isModal }) => {
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
+            <StockTable data={Object.values(stockData)} />
             <div className="space-y-4 p-4 md:p-5"></div>
           </div>
         </div>

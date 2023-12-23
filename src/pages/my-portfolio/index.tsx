@@ -30,7 +30,7 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
             >
               Add Stock
             </button>
-            <StockTable data={Object.values(stockData)} isEditable />
+            <StockTable data={Object.values(stockData)} />
           </div>
         </div>
       );

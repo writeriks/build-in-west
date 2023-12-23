@@ -21,12 +21,13 @@ import { type Stock } from "../../../../types/stock-types";
 
 interface TableBodyProps {
   isSelectable?: boolean;
-  isEdit: boolean;
+  isEdit?: boolean;
   data: Stock[];
   setData: (value: React.SetStateAction<Stock[]>) => void;
   pageSize: number;
   searchLabel: string;
   pageNumber: number;
+  onFavoriteChange?: () => void;
 }
 
 const TableBody: React.FC<TableBodyProps> = ({
@@ -37,6 +38,7 @@ const TableBody: React.FC<TableBodyProps> = ({
   data,
   pageNumber,
   setData,
+  onFavoriteChange,
 }) => {
   const filteredList = useMemo(
     () =>
@@ -96,6 +98,8 @@ const TableBody: React.FC<TableBodyProps> = ({
               isEdit={isEdit}
               cellStyles={TableStockCells(item)}
               item={item}
+              isFavorite={false}
+              onFavoriteChange={onFavoriteChange}
             />
           ))}
         </SortableContext>
@@ -115,6 +119,8 @@ const TableBody: React.FC<TableBodyProps> = ({
                 key={index}
                 isEdit={isEdit}
                 cellStyles={TableStockCells(item)}
+                isFavorite={false}
+                onFavoriteChange={onFavoriteChange}
               />
             ))
         : draggableTableBody()}

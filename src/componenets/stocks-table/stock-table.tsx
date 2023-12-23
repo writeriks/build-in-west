@@ -1,9 +1,4 @@
-import React, {
-  type ReactNode,
-  useDeferredValue,
-  useMemo,
-  useState,
-} from "react";
+import React, { useDeferredValue, useMemo, useState } from "react";
 
 import SearchBar from "../common/search-bar/search-bar";
 import TableHeader from "../common/table/table-header/table-header";
@@ -15,7 +10,6 @@ import { type Stock } from "../../types/stock-types";
 interface TableProps {
   isSelectable?: boolean;
   data: Stock[];
-  cellStyles?: ReactNode[];
   isEditable?: boolean;
 }
 
@@ -69,28 +63,26 @@ const StockTable: React.FC<TableProps> = ({
           </button>
         ) : null}
       </div>
-      <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-        <TableHeader
-          isSelectable={isSelectable}
-          isEdit={isEdit}
-          headers={headers}
-        />
-        <TableBody
-          data={stocksData}
-          setData={setStocksData}
-          searchLabel={searchLabel}
-          pageSize={PAGE_SIZE}
-          isEdit={isEdit}
-          isSelectable={isSelectable}
-          pageNumber={pageNumber}
-        />
-      </table>
-      <div className="flex justify-center">
-        <Pagination
-          count={pageCount}
-          pageNumber={pageNumber}
-          onPageChange={(value: number) => setPageNumber(value)}
-        />
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+          <TableHeader isSelectable={isSelectable} headers={headers} />
+          <TableBody
+            data={stocksData}
+            setData={setStocksData}
+            searchLabel={searchLabel}
+            pageSize={PAGE_SIZE}
+            isSelectable={isSelectable}
+            pageNumber={pageNumber}
+            onFavoriteChange={() => console.log("Favorite changed")}
+          />
+        </table>
+        <div className="flex justify-center">
+          <Pagination
+            count={pageCount}
+            pageNumber={pageNumber}
+            onPageChange={(value: number) => setPageNumber(value)}
+          />
+        </div>
       </div>
     </div>
   );
