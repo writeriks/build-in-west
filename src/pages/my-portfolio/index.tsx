@@ -1,26 +1,23 @@
 import React, { useState } from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
-import authenticationService from "../../service/authentication-service.ts/authentication-service";
+import Loading from "../../componenets/common/loading/loading";
 import StockTable from "../../componenets/stocks-table/stock-table";
+import StocksModal from "../../componenets/stocks-modal/stocks-modal";
+
+import authenticationService from "../../service/authentication-service.ts/authentication-service";
 
 import { type User } from "@prisma/client";
-import StocksModal from "../../componenets/stocks-modal/stocks-modal";
-import { api } from "../../utils/api";
-import Loading from "../../componenets/common/loading/loading";
 
 const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
-  console.log("🚀 ~ file: index.tsx:19 ~ dbUser:", dbUser);
-
-  const { data: stockData, isLoading, error } = api.stocks.getStocks.useQuery();
   const [isModal, setIsModal] = useState(false);
-  const componentToRender = () => {
-    if (isLoading) {
-      return <Loading />;
-    } else if (error) {
-      return <div>{error.message}</div>;
-    } else {
-      return (
+
+  return (
+    <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
+      <div className="h-16 h-full w-full bg-yellow-500 p-4">
+        <h1>My Portfolio</h1>
+        {isModal ? <StocksModal isModal setIsModal={setIsModal} /> : null}
+
         <div className="flex w-full flex-row justify-center">
           <div className="w-full md:w-[70%]">
             <button
@@ -30,19 +27,9 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
             >
               Add Stock
             </button>
-            <StockTable data={Object.values(stockData)} />
+            <StockTable isEditable />
           </div>
         </div>
-      );
-    }
-  };
-
-  return (
-    <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
-      <div className="h-16 h-full w-full bg-yellow-500 p-4">
-        <h1>My Portfolio</h1>
-        {isModal ? <StocksModal isModal setIsModal={setIsModal} /> : null}
-        {componentToRender()}
       </div>
     </div>
   );

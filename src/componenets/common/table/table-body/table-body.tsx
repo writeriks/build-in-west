@@ -27,7 +27,7 @@ interface TableBodyProps {
   pageSize: number;
   searchLabel: string;
   pageNumber: number;
-  onFavoriteChange?: () => void;
+  onFavoriteChange: (item: Stock) => void;
 }
 
 const TableBody: React.FC<TableBodyProps> = ({
@@ -98,8 +98,8 @@ const TableBody: React.FC<TableBodyProps> = ({
               isEdit={isEdit}
               cellStyles={TableStockCells(item)}
               item={item}
-              isFavorite={false}
-              onFavoriteChange={onFavoriteChange}
+              isFavorite={item.isFavorite}
+              onFavoriteChange={(item) => onFavoriteChange(item)}
             />
           ))}
         </SortableContext>
@@ -119,8 +119,8 @@ const TableBody: React.FC<TableBodyProps> = ({
                 key={index}
                 isEdit={isEdit}
                 cellStyles={TableStockCells(item)}
-                isFavorite={false}
-                onFavoriteChange={onFavoriteChange}
+                isFavorite={item.isFavorite}
+                onFavoriteChange={(item) => onFavoriteChange(item)}
               />
             ))
         : draggableTableBody()}

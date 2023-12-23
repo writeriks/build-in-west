@@ -1,15 +1,22 @@
+import { type UserStock } from "@prisma/client";
 import { type Stock } from "../../types/stock-types";
 
 class StockService {
-  generateStocks(table: HTMLTableSectionElement): Record<string, Stock> {
-    const stocksArray = this.generatStocksArrayFromHTMLTable(table);
+  generateStocks(
+    table: HTMLTableSectionElement,
+    userStocks: UserStock[]
+  ): Record<string, Stock> {
+    const stocksArray = this.generatStocksArrayFromHTMLTable(table, userStocks);
     const stocksDataObject =
       this.convertStockArrayToStockDataObject(stocksArray);
 
     return stocksDataObject;
   }
 
-  generatStocksArrayFromHTMLTable(table: HTMLTableSectionElement): Stock[] {
+  generatStocksArrayFromHTMLTable(
+    table: HTMLTableSectionElement,
+    userStocks: UserStock[]
+  ): Stock[] {
     const stocksArray: Stock[] = [];
     const rows = table.querySelectorAll("tr");
 
@@ -24,6 +31,11 @@ class StockService {
         rowData.push(column.textContent.trim());
       });
 
+      // Check if the user stocks array contains the current stock
+      const isFavorite = userStocks.some((userStock) => {
+        return userStock.symbol === rowData[0]!.split(" ")[0]!;
+      });
+
       stocksArray.push({
         id: rowData[0]!.split(" ")[0]!,
         symbol: rowData[0]!.split(" ")[0]!,
@@ -32,6 +44,7 @@ class StockService {
         change: rowData[3]!,
         volume: rowData[4]!,
         lastUpdate: rowData[5]!,
+        isFavorite: isFavorite,
       });
     });
 

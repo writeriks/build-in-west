@@ -1,29 +1,46 @@
-import React, { useDeferredValue, useMemo, useState } from "react";
+import React, { useDeferredValue, useEffect, useMemo, useState } from "react";
+
+import useSession from "../../hooks/useSession";
 
 import SearchBar from "../common/search-bar/search-bar";
 import TableHeader from "../common/table/table-header/table-header";
 import Pagination from "../common/pagination/pagination";
 import TableBody from "../common/table/table-body/table-body";
 
+import { api } from "../../utils/api";
+
 import { type Stock } from "../../types/stock-types";
 
 interface TableProps {
   isSelectable?: boolean;
-  data: Stock[];
   isEditable?: boolean;
 }
 
 const PAGE_SIZE = 10;
-const StockTable: React.FC<TableProps> = ({
-  isSelectable,
-  data,
-  isEditable,
-}) => {
-  const [stocksData, setStocksData] = useState(data);
+const StockTable: React.FC<TableProps> = ({ isSelectable, isEditable }) => {
+  const session = useSession();
+
+  const { data, isLoading, error, refetch } = api.stocks.getStocks.useQuery({
+    userId: session ? session?.id : "",
+  });
+
+  const [stocksData, setStocksData] = useState<Stock[]>([]);
   const [isEdit, setIsEdit] = useState(false);
   const [searchLabel, setSearchLabel] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const deferredSearchLabel = useDeferredValue(searchLabel);
+
+  useEffect(() => {
+    if (!isLoading && !error && data) {
+      const stocks = Object.values(data);
+      setStocksData(stocks);
+    }
+  }, [data, error, isLoading]);
+
+  const addStocksToWatchlistMutation =
+    api.stocks.addUserStocksToWatchList.useMutation();
+  const removeStocksToWatchlistMutation =
+    api.stocks.removeUserStocksToWatchList.useMutation();
 
   const headers = ["Symbol - Name", "Price", "Change %"];
 
@@ -33,13 +50,30 @@ const StockTable: React.FC<TableProps> = ({
   );
 
   const handleEdit = (isEdit: boolean) => {
-    console.log("🚀 ~ file: stock-table.tsx:55 ~ handleEdit ~ isEdit:", isEdit);
     if (isEdit) {
-      console.log("Saved");
-      console.log("🚀 ~ file: stock-table.tsx:33 ~ stocksData:", stocksData);
+      console.log("🚀 ~ SAVING ~ stocksData:", stocksData);
       // TODO: Save stocksData to DB
     }
     setIsEdit(!isEdit);
+  };
+
+  const toggleFavorite = async (stock: Stock) => {
+    if (!stock.isFavorite) {
+      await addStocksToWatchlistMutation.mutateAsync({
+        userId: session ? session?.id : "",
+        buyPrice: parseFloat(stock.lastPrice.replace(",", ".")),
+        stockSymbol: stock.symbol,
+        quantitiy: 1,
+        stockName: stock.name,
+      });
+    } else if (stock.isFavorite) {
+      console.log("🚀 ~ REMOVING ~ stock:", stock);
+      await removeStocksToWatchlistMutation.mutateAsync({
+        userId: session ? session?.id : "",
+        symbol: stock.symbol,
+      });
+    }
+    await refetch();
   };
 
   return (
@@ -65,7 +99,11 @@ const StockTable: React.FC<TableProps> = ({
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-          <TableHeader isSelectable={isSelectable} headers={headers} />
+          <TableHeader
+            isSelectable={isSelectable}
+            headers={headers}
+            isEdit={isEdit}
+          />
           <TableBody
             data={stocksData}
             setData={setStocksData}
@@ -73,7 +111,8 @@ const StockTable: React.FC<TableProps> = ({
             pageSize={PAGE_SIZE}
             isSelectable={isSelectable}
             pageNumber={pageNumber}
-            onFavoriteChange={() => console.log("Favorite changed")}
+            onFavoriteChange={(item) => toggleFavorite(item)}
+            isEdit={isEdit}
           />
         </table>
         <div className="flex justify-center">

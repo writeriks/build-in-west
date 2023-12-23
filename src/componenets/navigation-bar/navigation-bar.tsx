@@ -12,7 +12,7 @@ const NavigationBar = () => {
   );
 
   const { user, isLoading, error } = useUser();
-  console.log("🚀 ~ file: navigation-bar.tsx:14 ~ NavigationBar ~ user:", user);
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
 
