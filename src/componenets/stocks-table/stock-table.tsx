@@ -67,7 +67,6 @@ const StockTable: React.FC<TableProps> = ({ isSelectable, isEditable }) => {
         stockName: stock.name,
       });
     } else if (stock.isFavorite) {
-      console.log("🚀 ~ REMOVING ~ stock:", stock);
       await removeStocksToWatchlistMutation.mutateAsync({
         userId: session ? session?.id : "",
         symbol: stock.symbol,

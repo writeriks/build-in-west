@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
-import Loading from "../../componenets/common/loading/loading";
 import StockTable from "../../componenets/stocks-table/stock-table";
 import StocksModal from "../../componenets/stocks-modal/stocks-modal";
 
