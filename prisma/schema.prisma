@@ -23,17 +23,26 @@ model User {
   userStocks     UserStock[]
 }
 
+model Stock {
+  id        String      @id @default(cuid())
+  symbol    String      @unique
+  UserStock UserStock[]
+}
+
 model UserStock {
   id         String    @id @default(cuid())
+  symbol     String
   user       User      @relation(fields: [userId], references: [id])
   userId     String
-  name       String
-  symbol     String    @unique
+  stock      Stock     @relation(fields: [stockId], references: [id])
+  stockId    String
   buyPrice   Float
+  name       String
   quantity   Int
   updated_at DateTime? @default(now())
 
   @@index([userId])
+  @@index([stockId])
 }
 
 enum UserType {

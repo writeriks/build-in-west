@@ -6,7 +6,7 @@ import authenticationService from "../../service/authentication-service.ts/authe
 const MyExpenses = ({ dbUser }: { dbUser: User }) => {
   return (
     <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
-      <div className=" h-full w-full bg-yellow-500">Content</div>
+      <div className=" h-full w-full bg-yellow-400">Content</div>
     </div>
   );
 };

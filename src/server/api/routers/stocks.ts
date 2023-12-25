@@ -67,12 +67,32 @@ export const stocksRouter = createTRPCRouter({
         },
       });
 
+      let stock;
+      stock = await ctx.prisma.stock.findFirst({
+        where: {
+          symbol: stockSymbol,
+        },
+      });
+
+      if (!stock) {
+        stock = await ctx.prisma.stock.create({
+          data: {
+            symbol: stockSymbol,
+          },
+        });
+      }
+
       await ctx.prisma.userStock.create({
         data: {
           buyPrice: buyPrice,
           quantity: quantitiy,
           symbol: stockSymbol,
           name: stockName,
+          stock: {
+            connect: {
+              id: stock?.id,
+            },
+          },
           user: {
             connect: {
               id: owner?.id,
