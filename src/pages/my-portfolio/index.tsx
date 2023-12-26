@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
-import StockTable from "../../componenets/stocks-table/stock-table";
-import StocksModal from "../../componenets/stocks-modal/stocks-modal";
+import StockTable from "../../components/stocks-table/stock-table";
+import StocksModal from "../../components/stocks-modal/stocks-modal";
 
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
 

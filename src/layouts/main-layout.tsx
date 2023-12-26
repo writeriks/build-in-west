@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
-import NavigationBar from "../componenets/navigation-bar/navigation-bar";
-import SideBarMenu from "../componenets/side-bar-menu/side-bar-menu";
+import NavigationBar from "../components/navigation-bar/navigation-bar";
+import SideBarMenu from "../components/side-bar-menu/side-bar-menu";
 import { useSelector } from "react-redux";
 import uiReducerSelector from "../store/reducers/ui-reducer/ui-reducer-selector";
 
