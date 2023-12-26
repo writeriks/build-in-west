@@ -12,8 +12,8 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
   const [isModal, setIsModal] = useState(false);
 
   return (
-    <div className="flex h-[calc(100vh-60px)] w-screen flex-col">
-      <div className="h-16 h-full w-full bg-yellow-400 p-4">
+    <div className="flex h-[calc(100vh-60px)] flex-col">
+      <div className="h-full w-full bg-yellow-400 p-4">
         <h1>My Portfolio</h1>
         {isModal ? <StocksModal isModal setIsModal={setIsModal} /> : null}
 
