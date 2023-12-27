@@ -63,7 +63,7 @@ const TableRow: React.FC<TableRowProps> = ({
 
       <td
         className={
-          "transition-width flex justify-center overflow-hidden opacity-100 transition-opacity duration-500 duration-500"
+          "transition-width flex justify-center overflow-hidden opacity-100 transition-opacity duration-500"
         }
       >
         <div className="flex flex-row justify-end px-1 py-1 md:py-3">
@@ -90,7 +90,7 @@ const TableRow: React.FC<TableRowProps> = ({
       </td>
       <td
         className={
-          "transition-width overflow-hidden opacity-100 transition-opacity duration-500 duration-500"
+          "transition-width overflow-hidden opacity-100 transition-opacity duration-500"
         }
       >
         {isEdit ? (
