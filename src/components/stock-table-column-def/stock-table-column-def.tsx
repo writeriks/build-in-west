@@ -70,7 +70,7 @@ interface ToggleFavoriteProps {
 const ToggleFavorite: React.FC<ToggleFavoriteProps> = ({ stock }) => {
   const session = useSession();
 
-  const { refetch } = api.stocks.getStocks.useQuery({
+  const { refetch, isLoading } = api.stocks.getStocks.useQuery({
     userId: session ? session?.id : "",
   });
 
@@ -81,9 +81,10 @@ const ToggleFavorite: React.FC<ToggleFavoriteProps> = ({ stock }) => {
 
   const { isFavorite, id } = stock;
 
-  const isLoading =
+  const didFinishLoading =
     addStocksToWatchlistMutation.isLoading ||
-    removeStocksToWatchlistMutation.isLoading;
+    removeStocksToWatchlistMutation.isLoading ||
+    isLoading;
 
   const toggleFavorite = async (stock: Stock) => {
     if (!stock.isFavorite) {
@@ -105,7 +106,7 @@ const ToggleFavorite: React.FC<ToggleFavoriteProps> = ({ stock }) => {
 
   return (
     <>
-      {isLoading ? (
+      {didFinishLoading ? (
         <RotateCwIcon className="h-[15px] w-[px] animate-spin" />
       ) : (
         <DropdownMenu>
