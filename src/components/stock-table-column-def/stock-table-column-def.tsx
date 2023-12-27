@@ -81,6 +81,10 @@ const ToggleFavorite: React.FC<ToggleFavoriteProps> = ({ stock }) => {
 
   const { isFavorite, id } = stock;
 
+  const isLoading =
+    addStocksToWatchlistMutation.isLoading ||
+    removeStocksToWatchlistMutation.isLoading;
+
   const toggleFavorite = async (stock: Stock) => {
     if (!stock.isFavorite) {
       await addStocksToWatchlistMutation.mutateAsync({
@@ -101,7 +105,7 @@ const ToggleFavorite: React.FC<ToggleFavoriteProps> = ({ stock }) => {
 
   return (
     <>
-      {addStocksToWatchlistMutation.isLoading ? (
+      {isLoading ? (
         <RotateCwIcon className="h-[15px] w-[px] animate-spin" />
       ) : (
         <DropdownMenu>
