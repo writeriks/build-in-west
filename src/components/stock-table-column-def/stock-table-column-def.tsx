@@ -12,6 +12,7 @@ import { MoreHorizontal, Rotate3D, RotateCw, RotateCwIcon } from "lucide-react";
 import { type Stock } from "../../types/stock-types";
 import useSession from "../../hooks/useSession";
 import { api } from "../../utils/api";
+import { useRef, useState } from "react";
 
 export const stockTableColumnDef: ColumnDef<Stock>[] = [
   {
@@ -70,9 +71,11 @@ interface ToggleFavoriteProps {
 const ToggleFavorite: React.FC<ToggleFavoriteProps> = ({ stock }) => {
   const session = useSession();
 
-  const { refetch, isLoading } = api.stocks.getStocks.useQuery({
+  const { refetch } = api.stocks.getStocks.useQuery({
     userId: session ? session?.id : "",
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const addStocksToWatchlistMutation =
     api.stocks.addUserStocksToWatchList.useMutation();
@@ -81,32 +84,34 @@ const ToggleFavorite: React.FC<ToggleFavoriteProps> = ({ stock }) => {
 
   const { isFavorite, id } = stock;
 
-  const didFinishLoading =
-    addStocksToWatchlistMutation.isLoading ||
-    removeStocksToWatchlistMutation.isLoading ||
-    isLoading;
-
   const toggleFavorite = async (stock: Stock) => {
-    if (!stock.isFavorite) {
-      await addStocksToWatchlistMutation.mutateAsync({
-        userId: session ? session?.id : "",
-        buyPrice: parseFloat(stock.lastPrice.replace(",", ".")),
-        stockSymbol: stock.symbol,
-        quantitiy: 1,
-        stockName: stock.name,
-      });
-    } else if (stock.isFavorite) {
-      await removeStocksToWatchlistMutation.mutateAsync({
-        userId: session ? session?.id : "",
-        symbol: stock.symbol,
-      });
+    try {
+      setIsLoading(true);
+      if (!stock.isFavorite) {
+        await addStocksToWatchlistMutation.mutateAsync({
+          userId: session ? session?.id : "",
+          buyPrice: parseFloat(stock.lastPrice.replace(",", ".")),
+          stockSymbol: stock.symbol,
+          quantitiy: 1,
+          stockName: stock.name,
+        });
+      } else if (stock.isFavorite) {
+        await removeStocksToWatchlistMutation.mutateAsync({
+          userId: session ? session?.id : "",
+          symbol: stock.symbol,
+        });
+      }
+      await refetch();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-    await refetch();
   };
 
   return (
     <>
-      {didFinishLoading ? (
+      {isLoading ? (
         <RotateCwIcon className="h-[15px] w-[px] animate-spin" />
       ) : (
         <DropdownMenu>
