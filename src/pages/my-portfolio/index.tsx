@@ -1,20 +1,30 @@
 import React, { useState } from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
-import StockTable from "../../components/stocks-table/stock-table";
 import StocksModal from "../../components/stocks-modal/stocks-modal";
 
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
 
 import { type User } from "@prisma/client";
+import DataTable from "../../components/data-table/data-table";
+import useSession from "../../hooks/useSession";
+import { api } from "../../utils/api";
+import { stockTableColumnDef } from "../../components/stock-table-column-def/stock-table-column-def";
 
 const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
   const [isModal, setIsModal] = useState(false);
+  const session = useSession();
+
+  const { data, isLoading, error, refetch } = api.stocks.getStocks.useQuery({
+    userId: session ? session?.id : "",
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
 
   return (
     <div className="flex h-[calc(100vh-60px)] flex-col">
       <div className="h-full w-full bg-yellow-400 p-4">
-        <h1>My Portfolio</h1>
         {isModal ? <StocksModal isModal setIsModal={setIsModal} /> : null}
 
         <div className="flex w-full flex-row justify-center">
@@ -26,7 +36,16 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
             >
               Add Stock
             </button>
-            <StockTable isEditable />
+            <div className="">
+              <DataTable
+                data={Object.values(data)}
+                columnDef={stockTableColumnDef}
+                pageSize={5}
+                filtersEnabled
+                sortingEnabled
+              />
+            </div>
+            {/* <StockTable isEditable /> */}
           </div>
         </div>
       </div>
