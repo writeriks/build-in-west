@@ -37,7 +37,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({
 
         <th
           scope="col"
-          className="transition-width w-0 overflow-hidden p-0 px-3 py-1 opacity-100 transition-opacity duration-500 duration-500 md:px-6 md:py-3"
+          className="transition-width w-0 overflow-hidden p-0 px-3 py-1 opacity-100 transition-opacity duration-500 md:px-6 md:py-3"
         >
           Favorite
         </th>
@@ -45,7 +45,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({
           scope="col"
           className={`${
             isEdit
-              ? "transition-width w-0 overflow-hidden p-0 px-3 py-1 opacity-100 transition-opacity duration-500 duration-500 md:px-6 md:py-3"
+              ? "transition-width w-0 overflow-hidden p-0 px-3 py-1 opacity-100 transition-opacity duration-500 md:px-6 md:py-3"
               : "w-0 opacity-0"
           }`}
         >

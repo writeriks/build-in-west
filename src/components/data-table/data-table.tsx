@@ -36,12 +36,14 @@ interface DataTableProps {
   pageSize?: number;
   sortingEnabled?: boolean;
   filtersEnabled?: boolean;
+  selectingEnabled?: boolean;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
   data,
   columnDef,
   filtersEnabled = false,
+  selectingEnabled = false,
   pageSize = 10,
 }) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -135,7 +137,7 @@ const DataTable: React.FC<DataTableProps> = ({
           </TableBody>
         </Table>
       </div>
-      <Pagination table={table} />
+      <Pagination table={table} selectingEnabled={selectingEnabled} />
     </div>
   );
 };

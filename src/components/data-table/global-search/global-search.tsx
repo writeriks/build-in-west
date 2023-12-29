@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
 import { Button } from "../../ui/button";
-import { ChevronDown } from "lucide-react";
+import { PencilIcon, FilterIcon } from "lucide-react";
 import { type Table } from "@tanstack/react-table";
 
 interface GlobalSearchProps {
@@ -28,13 +28,16 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({
         placeholder="Search in Table..."
         value={deferredFilter}
         onChange={(event) => setGlobalFilter(event.currentTarget.value)}
-        className="max-w-sm"
+        className="w-38 md:w-64"
       />
 
+      <Button variant="outline" className="ml-auto">
+        <PencilIcon className="h-3 w-3" />
+      </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="ml-auto">
-            Columns <ChevronDown className="ml-2 h-4 w-4" />
+          <Button variant="outline" className="ml-2">
+            <FilterIcon className="h-3 w-3" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

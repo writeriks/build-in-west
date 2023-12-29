@@ -1,25 +1,33 @@
 import React, { useState } from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
+import useSession from "../../hooks/useSession";
+
 import StocksModal from "../../components/stocks-modal/stocks-modal";
+import Loading from "../../components/common/loading/loading";
+import { Button } from "../../components/ui/button";
+import DataTable from "../../components/data-table/data-table";
 
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
+import { stockTableColumnDef } from "../../components/stock-table-column-def/stock-table-column-def";
+import { api } from "../../utils/api";
 
 import { type User } from "@prisma/client";
-import DataTable from "../../components/data-table/data-table";
-import useSession from "../../hooks/useSession";
-import { api } from "../../utils/api";
-import { stockTableColumnDef } from "../../components/stock-table-column-def/stock-table-column-def";
 
-const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
+const MyPortfolio = ({
+  dbUser,
+  isMobile,
+}: {
+  dbUser: User;
+  isMobile: boolean;
+}) => {
   const [isModal, setIsModal] = useState(false);
   const session = useSession();
 
-  const { data, isLoading, error, refetch } = api.stocks.getStocks.useQuery({
+  const { data, isLoading, error } = api.stocks.getStocks.useQuery({
     userId: session ? session?.id : "",
   });
 
-  if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
 
   return (
@@ -29,23 +37,22 @@ const MyPortfolio = ({ dbUser }: { dbUser: User }) => {
 
         <div className="flex w-full flex-row justify-center">
           <div className="w-full md:w-[70%]">
-            <button
-              type="button"
-              className="mb-2 me-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-              onClick={() => setIsModal(!isModal)}
-            >
+            <Button variant="outline" onClick={() => setIsModal(!isModal)}>
               Add Stock
-            </button>
-            <div className="">
-              <DataTable
-                data={Object.values(data)}
-                columnDef={stockTableColumnDef}
-                pageSize={5}
-                filtersEnabled
-                sortingEnabled
-              />
+            </Button>
+            <div>
+              {isLoading ? (
+                <Loading />
+              ) : (
+                <DataTable
+                  data={Object.values(data)}
+                  columnDef={stockTableColumnDef(isMobile)}
+                  pageSize={5}
+                  filtersEnabled
+                  sortingEnabled
+                />
+              )}
             </div>
-            {/* <StockTable isEditable /> */}
           </div>
         </div>
       </div>
@@ -66,9 +73,14 @@ export const getServerSideProps = withPageAuthRequired({
     const stocks = await trpc.stocks.getStocks(); */
 
     const dbUser = await authenticationService.getUserWithSession(req, res);
+    const isMobile =
+      context?.req?.headers["user-agent"]?.includes("iPhone") ??
+      context?.req?.headers["user-agent"]?.includes("iPhone");
+
     return {
       props: {
         dbUser: JSON.parse(JSON.stringify(dbUser)) as User,
+        isMobile: isMobile,
       },
     };
   },
