@@ -3,7 +3,7 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 import useSession from "../../hooks/useSession";
 
-import AddStockModal from "../../components/stocks-modal/stocks-modal";
+import AddStockDialog from "../../components/add-stocks-dialog/add-stocks-dialog";
 import Loading from "../../components/common/loading/loading";
 import DataTable from "../../components/data-table/data-table";
 
@@ -33,7 +33,7 @@ const MyPortfolio = ({
       <div className="h-full w-full bg-yellow-400 p-4">
         <div className="flex w-full flex-row justify-center">
           <div className="w-full md:w-[70%]">
-            <AddStockModal stocks={data ? Object.values(data) : []} />
+            <AddStockDialog stocks={data ? Object.values(data) : []} />
             <div>
               {isLoading ? (
                 <Loading />

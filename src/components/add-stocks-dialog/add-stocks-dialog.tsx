@@ -15,12 +15,15 @@ import { Combobox } from "../ui/combobox";
 import { CommandItem } from "../ui/command";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import StockDialogTrigger from "./stock-dialog-trigger";
+import AddStocksDialogHeader from "./add-stocks-dialog-header";
+import StockDialogFooter from "./stock-dialog-footer";
 
 interface AddStockModalProps {
   stocks: Stock[];
 }
 
-const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
+const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
   const [inputValue, setInputValue] = useState("");
   const [selectedStockName, setSelectedStockName] = useState<string>("");
   const [quantityInput, setQuantityInput] = useState<number>(1);
@@ -91,16 +94,22 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
     setSelectedStocObject(undefined);
   };
 
+  const handleStockAdd = () => {
+    console.log("Stock added");
+  };
+
   return (
     <Dialog onOpenChange={() => onDialogClose()}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Add New Stock</Button>
-      </DialogTrigger>
+      <StockDialogTrigger
+        buttonProps={{ variant: "outline" }}
+        title="Add New Stock"
+      />
+
       <DialogContent className="w-full">
-        <DialogHeader>
-          <DialogTitle>Add New Stock</DialogTitle>
-          <DialogDescription>Add new stock to your portfolio</DialogDescription>
-        </DialogHeader>
+        <AddStocksDialogHeader
+          title="Add New Stock"
+          description="Add new stock to your portfolio"
+        />
 
         <div className="grid grid-flow-row gap-3">
           <div className="xsm:w-full grid items-center gap-1.5 md:w-auto">
@@ -176,21 +185,14 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
           </div>
         </div>
 
-        <DialogFooter className="sm:justify-start">
-          <Button type="button">Add Stock</Button>
-          <DialogClose asChild>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => onDialogClose()}
-            >
-              Close
-            </Button>
-          </DialogClose>
-        </DialogFooter>
+        <StockDialogFooter
+          onAddStock={handleStockAdd}
+          onDialogClose={onDialogClose}
+          addButtonDisabled={true}
+        />
       </DialogContent>
     </Dialog>
   );
 };
 
-export default AddStockModal;
+export default AddStockDialog;
