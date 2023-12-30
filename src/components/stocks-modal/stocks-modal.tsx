@@ -24,7 +24,6 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
   const [inputValue, setInputValue] = useState("");
   const [selectedStockName, setSelectedStockName] = useState<string>("");
   const [quantityInput, setQuantityInput] = useState<number>(1);
-  const [totalAmount, setTotalAmount] = useState<number>(0);
   const [selectedStocObject, setSelectedStocObject] = useState<Stock>();
 
   const [open, setOpen] = React.useState(false);
@@ -78,11 +77,7 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
   const renderDropdownOptions = () =>
     debouncedStocks?.length ? (
       debouncedStocks.map((stock, index) => (
-        <CommandItem
-          className="xsm:w-full md:w-[250px]"
-          key={index}
-          onSelect={handleSelection}
-        >
+        <CommandItem className="w-full" key={index} onSelect={handleSelection}>
           {stock.label}
         </CommandItem>
       ))
@@ -101,11 +96,12 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
       <DialogTrigger asChild>
         <Button variant="outline">Add New Stock</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-full">
         <DialogHeader>
           <DialogTitle>Add New Stock</DialogTitle>
           <DialogDescription>Add new stock to your portfolio</DialogDescription>
         </DialogHeader>
+
         <div className="grid grid-flow-row gap-3">
           <div className="xsm:w-full grid items-center gap-1.5 md:w-auto">
             <Label
@@ -114,22 +110,24 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
             >
               Stock
             </Label>
+
             <Combobox
               notFoundLabel="Stock does not exist..."
               inputValue={inputValue}
               onInputChange={handleInputChange}
               id="stock-search"
               selectedItem={selectedStockName.toUpperCase()}
-              placeholder="Please search for a stock..."
+              placeholder="Search for stock"
               items={debouncedStocks!}
               onSelect={handleSelection}
               renderOptions={renderDropdownOptions}
               isDropdownOpen={open}
               setIsDropdownOpen={setOpen}
-              comboboxClass="justify-between w-full"
+              comboboxClass="justify-between w-full "
               popoverClass="p-0 w-full"
             />
           </div>
+
           <div className="xsm:w-full md:w-auto">
             <Label
               className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left font-bold capitalize"
@@ -144,6 +142,7 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
               {selectedStocObject?.lastPrice}
             </Label>
           </div>
+
           <div className="xsm:w-full grid items-center gap-1.5 md:w-auto">
             <Label
               className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left font-bold capitalize"
@@ -160,6 +159,7 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
               onChange={(e) => setQuantityInput(Number(e.target.value))}
             />
           </div>
+
           <div className="xsm:w-full md:w-auto">
             <Label
               className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left font-bold capitalize"
@@ -175,6 +175,7 @@ const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
             </Label>
           </div>
         </div>
+
         <DialogFooter className="sm:justify-start">
           <Button type="button">Add Stock</Button>
           <DialogClose asChild>

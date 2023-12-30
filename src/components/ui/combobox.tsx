@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/popover";
 
 import { ChevronsUpDown } from "lucide-react";
+import exp from "constants";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Items = {
@@ -59,6 +60,28 @@ export const Combobox: React.FC<ComboboxProps> = ({
       </CommandItem>
     ));
 
+  useLayoutEffect(() => {
+    const setDropdownWidth = () => {
+      const input = document.getElementById(id);
+      const expandedDropdown = document.querySelector(
+        "[data-radix-popper-content-wrapper]"
+      );
+
+      if (
+        input instanceof HTMLElement &&
+        expandedDropdown instanceof HTMLElement
+      ) {
+        const dialogWidth = input.clientWidth; // Get input width
+        expandedDropdown.style.minWidth = `${dialogWidth}px`;
+      }
+    };
+    // Delay to ensure the element is available
+    const delay = setTimeout(() => {
+      setDropdownWidth();
+      clearTimeout(delay);
+    }, 1); // Adjust the delay time as needed
+  });
+
   return (
     <Popover open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <PopoverTrigger asChild>
@@ -73,7 +96,7 @@ export const Combobox: React.FC<ComboboxProps> = ({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={popoverClass}>
+      <PopoverContent className={popoverClass} asChild>
         <Command shouldFilter={false}>
           <CommandInput
             className="uppercase"
