@@ -8,56 +8,84 @@ import {
   DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
 import { Button } from "../../ui/button";
-import { PencilIcon, FilterIcon } from "lucide-react";
+import { HandIcon, GrabIcon, FilterIcon } from "lucide-react";
 import { type Table } from "@tanstack/react-table";
+import { cn } from "../../../lib/utils";
 
 interface GlobalSearchProps {
   deferredFilter: string;
-  setGlobalFilter: (value: string) => void;
+  setGlobalFilter?: (value: string) => void;
   table: Table<any>;
+  isSort?: boolean;
+  handleSort?: (value: boolean) => void;
 }
 
 const GlobalSearch: React.FC<GlobalSearchProps> = ({
+  table,
   deferredFilter,
   setGlobalFilter,
-  table,
+  handleSort,
+  isSort = false,
 }) => {
   return (
     <div className="flex items-center py-4">
-      <Input
-        placeholder="Search in Table..."
-        value={deferredFilter}
-        onChange={(event) => setGlobalFilter(event.currentTarget.value)}
-        className="w-38 md:w-64"
-      />
+      {setGlobalFilter ? (
+        <Input
+          placeholder="Search in Table..."
+          value={deferredFilter}
+          onChange={(event) => setGlobalFilter(event.currentTarget.value)}
+          className="w-38 md:w-64"
+        />
+      ) : null}
 
-      <Button variant="outline" className="ml-auto">
-        <PencilIcon className="h-3 w-3" />
-      </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="ml-2">
-            <FilterIcon className="h-3 w-3" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {table
-            .getAllColumns()
-            .filter((column) => column.getCanHide())
-            .map((column) => {
-              return (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {handleSort ? (
+        <Button
+          onClick={() => handleSort && handleSort(isSort)}
+          variant="outline"
+          className={cn(
+            "ml-auto ",
+            isSort ? "bg-gray-300 hover:bg-gray-300" : ""
+          )}
+        >
+          {isSort ? (
+            <GrabIcon className="h-4 w-4" />
+          ) : (
+            <HandIcon className="h-4 w-4" />
+          )}
+        </Button>
+      ) : null}
+
+      {setGlobalFilter ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(handleSort ? "ml-2" : "ml-auto")}
+            >
+              <FilterIcon className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : null}
     </div>
   );
 };

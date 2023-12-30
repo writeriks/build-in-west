@@ -1,7 +1,7 @@
 export interface Stock {
   symbol: string;
   name: string;
-  lastPrice: string;
+  lastPrice: number;
   volume: string;
   lastUpdate: string;
   change: string;

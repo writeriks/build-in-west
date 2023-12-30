@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 import useSession from "../../hooks/useSession";
 
-import StocksModal from "../../components/stocks-modal/stocks-modal";
+import AddStockModal from "../../components/stocks-modal/stocks-modal";
 import Loading from "../../components/common/loading/loading";
-import { Button } from "../../components/ui/button";
 import DataTable from "../../components/data-table/data-table";
 
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
@@ -21,7 +20,6 @@ const MyPortfolio = ({
   dbUser: User;
   isMobile: boolean;
 }) => {
-  const [isModal, setIsModal] = useState(false);
   const session = useSession();
 
   const { data, isLoading, error } = api.stocks.getStocks.useQuery({
@@ -33,13 +31,9 @@ const MyPortfolio = ({
   return (
     <div className="flex h-[calc(100vh-60px)] flex-col">
       <div className="h-full w-full bg-yellow-400 p-4">
-        {isModal ? <StocksModal isModal setIsModal={setIsModal} /> : null}
-
         <div className="flex w-full flex-row justify-center">
           <div className="w-full md:w-[70%]">
-            <Button variant="outline" onClick={() => setIsModal(!isModal)}>
-              Add Stock
-            </Button>
+            <AddStockModal stocks={data ? Object.values(data) : []} />
             <div>
               {isLoading ? (
                 <Loading />
@@ -47,7 +41,7 @@ const MyPortfolio = ({
                 <DataTable
                   data={Object.values(data)}
                   columnDef={stockTableColumnDef(isMobile)}
-                  pageSize={5}
+                  pageSize={isMobile ? 5 : 8}
                   filtersEnabled
                   sortingEnabled
                 />

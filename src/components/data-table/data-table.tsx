@@ -23,6 +23,25 @@ import {
 import GlobalSearch from "./global-search/global-search";
 import Pagination from "./pagination/pagination";
 
+import {
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+
+import { type Stock } from "../../types/stock-types";
+import DataTableRow from "./data-table-row/data-table-row";
+
 export type Payment = {
   id: string;
   amount: number;
@@ -46,7 +65,9 @@ const DataTable: React.FC<DataTableProps> = ({
   selectingEnabled = false,
   pageSize = 10,
 }) => {
+  const [tableData, setTableData] = React.useState<Stock[]>(data);
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [isSort, setIsSort] = React.useState<boolean>(false);
 
   const [globalFilter, setGlobalFilter] = React.useState<string>();
   const deferredFilter = React.useDeferredValue(globalFilter);
@@ -56,7 +77,7 @@ const DataTable: React.FC<DataTableProps> = ({
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
+    data: tableData,
     columns: columnDef,
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
@@ -78,15 +99,48 @@ const DataTable: React.FC<DataTableProps> = ({
     table.setPageSize(pageSize);
   }, [table, pageSize]);
 
+  const handleSort = (isSort: boolean) => {
+    if (isSort) {
+      console.log("🚀 ~ SAVING ~ stocksData:");
+      // TODO: Save the order of stocksData to DB
+    }
+    setIsSort(!isSort);
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) {
+      return;
+    }
+
+    if (active.id !== over.id) {
+      setTableData((tableData) => {
+        const oldIndex = tableData.findIndex(
+          (data) => data.symbol === active.id
+        );
+        const newIndex = tableData.findIndex((data) => data.symbol === over.id);
+        return arrayMove(tableData, oldIndex, newIndex);
+      });
+    }
+  };
+
   return (
     <div className="w-full">
-      {filtersEnabled ? (
-        <GlobalSearch
-          deferredFilter={deferredFilter ? deferredFilter : ""}
-          setGlobalFilter={setGlobalFilter}
-          table={table}
-        />
-      ) : null}
+      <GlobalSearch
+        table={table}
+        deferredFilter={deferredFilter ? deferredFilter : ""}
+        setGlobalFilter={filtersEnabled ? setGlobalFilter : undefined}
+        isSort={isSort}
+        handleSort={(isSort) => handleSort(isSort)}
+      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -107,23 +161,33 @@ const DataTable: React.FC<DataTableProps> = ({
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={tableData}
+                  strategy={verticalListSortingStrategy}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+                  {table.getRowModel().rows.map((row) => (
+                    <DataTableRow
+                      key={row.id}
+                      row={row}
+                      item={
+                        tableData.find(
+                          (item) =>
+                            item.symbol === (row.original as Stock).symbol
+                        )!
+                      }
+                      isSort={isSort}
+                    />
                   ))}
-                </TableRow>
-              ))
+                </SortableContext>
+              </DndContext>
             ) : (
               <TableRow>
                 <TableCell

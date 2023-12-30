@@ -40,7 +40,7 @@ class StockService {
         id: rowData[0]!.split(" ")[0]!,
         symbol: rowData[0]!.split(" ")[0]!,
         name: rowData[0]!.split(" ").splice(1)!.join(" ")!,
-        lastPrice: rowData[2]!,
+        lastPrice: parseFloat(rowData[2]!.replace(",", ".")),
         change: rowData[3]!,
         volume: rowData[4]!,
         lastUpdate: rowData[5]!,

@@ -61,7 +61,7 @@ const StockTable: React.FC<TableProps> = ({ isSelectable, isEditable }) => {
     if (!stock.isFavorite) {
       await addStocksToWatchlistMutation.mutateAsync({
         userId: session ? session?.id : "",
-        buyPrice: parseFloat(stock.lastPrice.replace(",", ".")),
+        buyPrice: stock.lastPrice,
         stockSymbol: stock.symbol,
         quantitiy: 1,
         stockName: stock.name,

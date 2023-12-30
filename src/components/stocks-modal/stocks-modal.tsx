@@ -1,86 +1,195 @@
-import React, { useEffect, useRef } from "react";
-import StockTable from "../stocks-table/stock-table";
+import React, { useDeferredValue, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { type Stock } from "../../types/stock-types";
+import { Combobox } from "../ui/combobox";
+import { CommandItem } from "../ui/command";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
-interface StocksModalProps {
-  isModal: boolean;
-  setIsModal: (value: React.SetStateAction<boolean>) => void;
+interface AddStockModalProps {
+  stocks: Stock[];
 }
 
-const StocksModal: React.FC<StocksModalProps> = ({ setIsModal, isModal }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
+const AddStockModal: React.FC<AddStockModalProps> = ({ stocks }) => {
+  const [inputValue, setInputValue] = useState("");
+  const [selectedStockName, setSelectedStockName] = useState<string>("");
+  const [quantityInput, setQuantityInput] = useState<number>(1);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [selectedStocObject, setSelectedStocObject] = useState<Stock>();
 
-  useEffect(() => {
-    const closeSettingsOnEsc = (event: KeyboardEvent): void => {
-      const { key } = event;
-      if (key === "Escape") {
-        setIsModal(false);
-      }
-    };
+  const [open, setOpen] = React.useState(false);
 
-    const closeSettingsOnClick = ({ target }: MouseEvent): void => {
-      if (modalRef.current && modalRef.current === target) {
-        setIsModal(false);
-      }
-    };
+  const transformedStocks = useMemo(
+    () =>
+      stocks.map((stock) => ({
+        label: `${stock.symbol} ${stock.name}`,
+        value: stock.symbol,
+      })),
+    [stocks]
+  );
 
-    if (isModal) {
-      document.addEventListener("keyup", closeSettingsOnEsc);
-      document.addEventListener("click", closeSettingsOnClick);
+  const filteredStocks = useMemo(() => {
+    if (!inputValue) {
+      return null;
     }
+    return transformedStocks
+      .filter((stock) =>
+        stock.label.toUpperCase().includes(inputValue.toUpperCase())
+      )
+      .slice(0, 5);
+  }, [inputValue, transformedStocks]);
 
-    return () => {
-      document.removeEventListener("keyup", closeSettingsOnEsc);
-      document.removeEventListener("click", closeSettingsOnClick);
-    };
-  }, [isModal, setIsModal]);
+  const calculatedAmount = useMemo(() => {
+    if (!selectedStocObject?.lastPrice) {
+      return 0;
+    }
+    const amount = Number(selectedStocObject?.lastPrice) * quantityInput;
+    return parseFloat(amount.toFixed(2));
+  }, [quantityInput, selectedStocObject?.lastPrice]);
+
+  const debouncedStocks = useDeferredValue(filteredStocks);
+
+  const handleSelection = (value: string) => {
+    setSelectedStockName(value);
+
+    const stockSymbol = value.split(" ")[0];
+    const selectedStockData = stocks.find(
+      (stock) => stock.symbol.toUpperCase() === stockSymbol?.toUpperCase()
+    );
+    setSelectedStocObject(selectedStockData);
+
+    setOpen(false);
+  };
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+  };
+
+  const renderDropdownOptions = () =>
+    debouncedStocks?.length ? (
+      debouncedStocks.map((stock, index) => (
+        <CommandItem
+          className="xsm:w-full md:w-[250px]"
+          key={index}
+          onSelect={handleSelection}
+        >
+          {stock.label}
+        </CommandItem>
+      ))
+    ) : (
+      <></>
+    );
+
+  const onDialogClose = () => {
+    setInputValue("");
+    setSelectedStockName("");
+    setSelectedStocObject(undefined);
+  };
 
   return (
-    <>
-      <div className="fixed bottom-0 left-0 right-0 top-0 z-10 flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-gray-700 opacity-75"></div>
-      <div
-        id="default-modal"
-        ref={modalRef}
-        tabIndex={-1}
-        aria-hidden="true"
-        className="fixed bottom-0 left-0 right-0 top-0 z-20 flex h-screen w-full flex-col items-center justify-center overflow-hidden"
-      >
-        <div className="relative max-h-full w-full max-w-4xl p-4">
-          <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
-            <div className="flex items-center justify-between rounded-t border-b p-4 dark:border-gray-600 md:p-5">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Add New Stock
-              </h3>
-              <button
-                type="button"
-                className="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
-                data-modal-hide="default-modal"
-                onClick={() => setIsModal(!isModal)}
-              >
-                <svg
-                  className="h-3 w-3"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 14 14"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                  />
-                </svg>
-                <span className="sr-only">Close modal</span>
-              </button>
-            </div>
-            <StockTable />
-            <div className="space-y-4 p-4 md:p-5"></div>
+    <Dialog onOpenChange={() => onDialogClose()}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Add New Stock</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add New Stock</DialogTitle>
+          <DialogDescription>Add new stock to your portfolio</DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-flow-row gap-3">
+          <div className="xsm:w-full grid items-center gap-1.5 md:w-auto">
+            <Label
+              className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left font-bold capitalize"
+              htmlFor="stock-search"
+            >
+              Stock
+            </Label>
+            <Combobox
+              notFoundLabel="Stock does not exist..."
+              inputValue={inputValue}
+              onInputChange={handleInputChange}
+              id="stock-search"
+              selectedItem={selectedStockName.toUpperCase()}
+              placeholder="Please search for a stock..."
+              items={debouncedStocks!}
+              onSelect={handleSelection}
+              renderOptions={renderDropdownOptions}
+              isDropdownOpen={open}
+              setIsDropdownOpen={setOpen}
+              comboboxClass="justify-between w-full"
+              popoverClass="p-0 w-full"
+            />
+          </div>
+          <div className="xsm:w-full md:w-auto">
+            <Label
+              className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left font-bold capitalize"
+              htmlFor="stock-price"
+            >
+              Price
+            </Label>
+            <Label
+              className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left capitalize"
+              id="stock-price"
+            >
+              {selectedStocObject?.lastPrice}
+            </Label>
+          </div>
+          <div className="xsm:w-full grid items-center gap-1.5 md:w-auto">
+            <Label
+              className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left font-bold capitalize"
+              htmlFor="stock-quantity"
+            >
+              Quantity
+            </Label>
+            <Input
+              className="w-full"
+              type="number"
+              id="stock-quantity"
+              title="Quantity"
+              value={quantityInput}
+              onChange={(e) => setQuantityInput(Number(e.target.value))}
+            />
+          </div>
+          <div className="xsm:w-full md:w-auto">
+            <Label
+              className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left font-bold capitalize"
+              htmlFor="stock-amount"
+            >
+              Amount
+            </Label>
+            <Label
+              className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left capitalize"
+              id="stock-amount"
+            >
+              {calculatedAmount} TRY
+            </Label>
           </div>
         </div>
-      </div>
-    </>
+        <DialogFooter className="sm:justify-start">
+          <Button type="button">Add Stock</Button>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => onDialogClose()}
+            >
+              Close
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default StocksModal;
+export default AddStockModal;
