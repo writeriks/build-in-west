@@ -1,24 +1,22 @@
 import React, { useDeferredValue, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { type Stock } from "../../types/stock-types";
+
+import useSession from "../../hooks/useSession";
+import { useValidateData } from "../../hooks/use-validate-data";
+
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Combobox } from "../ui/combobox";
 import { CommandItem } from "../ui/command";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { useToast } from "../ui/use-toast";
+import { Toaster } from "../ui/toaster";
 import StockDialogTrigger from "./stock-dialog-trigger";
 import AddStocksDialogHeader from "./add-stocks-dialog-header";
 import StockDialogFooter from "./stock-dialog-footer";
 
+import { api } from "../../utils/api";
+
+import { type Stock } from "../../types/stock-types";
 interface AddStockModalProps {
   stocks: Stock[];
 }
@@ -26,10 +24,25 @@ interface AddStockModalProps {
 const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
   const [inputValue, setInputValue] = useState("");
   const [selectedStockName, setSelectedStockName] = useState<string>("");
-  const [quantityInput, setQuantityInput] = useState<number>(1);
+  const [quantityInput, setQuantityInput] = useState<number>(0);
+  const [stockPrice, setStockPrice] = useState<number>(0);
   const [selectedStocObject, setSelectedStocObject] = useState<Stock>();
 
   const [open, setOpen] = React.useState(false);
+
+  const session = useSession();
+
+  const { toast } = useToast();
+
+  const addStocksToWatchlistMutation =
+    api.stocks.addUserStocksToWatchList.useMutation({
+      onSuccess: () =>
+        toast({
+          title: "Stock added to watchlist",
+          description: "Successfully added stock to watchlist",
+          duration: 3000,
+        }),
+    });
 
   const transformedStocks = useMemo(
     () =>
@@ -61,6 +74,12 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
 
   const debouncedStocks = useDeferredValue(filteredStocks);
 
+  const isDataValidated = useValidateData([
+    selectedStocObject,
+    quantityInput,
+    stockPrice,
+  ]);
+
   const handleSelection = (value: string) => {
     setSelectedStockName(value);
 
@@ -69,7 +88,7 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
       (stock) => stock.symbol.toUpperCase() === stockSymbol?.toUpperCase()
     );
     setSelectedStocObject(selectedStockData);
-
+    setStockPrice(selectedStockData?.lastPrice ?? 0);
     setOpen(false);
   };
 
@@ -92,10 +111,26 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
     setInputValue("");
     setSelectedStockName("");
     setSelectedStocObject(undefined);
+    setQuantityInput(0);
+    setStockPrice(0);
   };
 
-  const handleStockAdd = () => {
-    console.log("Stock added");
+  const handleStockAdd = async () => {
+    if (selectedStocObject) {
+      try {
+        await addStocksToWatchlistMutation.mutateAsync({
+          userId: session ? session?.id : "",
+          buyPrice: stockPrice ?? 0,
+          stockSymbol: selectedStocObject.symbol,
+          quantitiy: quantityInput,
+          stockName: selectedStocObject.name,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      console.log("No stock object", selectedStocObject);
+    }
   };
 
   return (
@@ -104,6 +139,7 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
         buttonProps={{ variant: "outline" }}
         title="Add New Stock"
       />
+      <Toaster />
 
       <DialogContent className="w-full">
         <AddStocksDialogHeader
@@ -144,12 +180,14 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
             >
               Price
             </Label>
-            <Label
-              className="md:text-md text-ct-teal-600 xsm:text-sm px-1 text-left capitalize"
+            <Input
+              className="w-full"
+              type="number"
               id="stock-price"
-            >
-              {selectedStocObject?.lastPrice}
-            </Label>
+              title="Quantity"
+              value={stockPrice || selectedStocObject?.lastPrice}
+              onChange={(e) => setStockPrice(Number(e.target.value))}
+            />
           </div>
 
           <div className="xsm:w-full grid items-center gap-1.5 md:w-auto">
@@ -188,7 +226,7 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
         <StockDialogFooter
           onAddStock={handleStockAdd}
           onDialogClose={onDialogClose}
-          addButtonDisabled={true}
+          addButtonDisabled={!isDataValidated}
         />
       </DialogContent>
     </Dialog>
