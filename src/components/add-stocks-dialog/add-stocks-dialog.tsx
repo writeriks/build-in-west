@@ -68,9 +68,15 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
     if (!selectedStocObject?.lastPrice) {
       return 0;
     }
-    const amount = Number(selectedStocObject?.lastPrice) * quantityInput;
+
+    let amount = 0;
+    if (stockPrice > 0) {
+      amount = stockPrice * quantityInput;
+    } else {
+      amount = Number(selectedStocObject?.lastPrice) * quantityInput;
+    }
     return parseFloat(amount.toFixed(2));
-  }, [quantityInput, selectedStocObject?.lastPrice]);
+  }, [quantityInput, selectedStocObject?.lastPrice, stockPrice]);
 
   const debouncedStocks = useDeferredValue(filteredStocks);
 

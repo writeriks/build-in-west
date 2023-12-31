@@ -82,24 +82,46 @@ export const stocksRouter = createTRPCRouter({
         });
       }
 
-      await ctx.prisma.userStock.create({
-        data: {
-          buyPrice: buyPrice,
-          quantity: quantitiy,
+      const existingUserStock = await ctx.prisma.userStock.findFirst({
+        where: {
           symbol: stockSymbol,
-          name: stockName,
-          stock: {
-            connect: {
-              id: stock?.id,
-            },
-          },
-          user: {
-            connect: {
-              id: owner?.id,
-            },
-          },
+          userId: userId,
         },
       });
+
+      if (existingUserStock) {
+        await ctx.prisma.userStock.update({
+          where: {
+            id: existingUserStock?.id,
+          },
+          data: {
+            buyPrice:
+              (existingUserStock?.buyPrice * existingUserStock.quantity +
+                buyPrice * quantitiy) /
+              (existingUserStock.quantity + quantitiy),
+            quantity: existingUserStock.quantity + quantitiy,
+          },
+        });
+      } else {
+        await ctx.prisma.userStock.create({
+          data: {
+            buyPrice: buyPrice,
+            quantity: quantitiy,
+            symbol: stockSymbol,
+            name: stockName,
+            stock: {
+              connect: {
+                id: stock?.id,
+              },
+            },
+            user: {
+              connect: {
+                id: owner?.id,
+              },
+            },
+          },
+        });
+      }
     }),
   removeUserStocksToWatchList: publicProcedure
     .input(
