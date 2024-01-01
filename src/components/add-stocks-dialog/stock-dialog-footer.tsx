@@ -15,9 +15,11 @@ const StockDialogFooter: React.FC<StockDialogFooterProps> = ({
 }) => {
   return (
     <DialogFooter className="sm:justify-start">
-      <Button type="button" onClick={onAddStock} disabled={addButtonDisabled}>
-        Add Stock
-      </Button>
+      <DialogClose asChild>
+        <Button type="button" onClick={onAddStock} disabled={addButtonDisabled}>
+          Add Stock
+        </Button>
+      </DialogClose>
       <DialogClose asChild>
         <Button
           type="button"

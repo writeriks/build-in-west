@@ -11,6 +11,11 @@ class UiReducerSelector {
     this.getUiReducer,
     (ui) => ui.isHamburgerMenuOpen
   );
+
+  getShouldRefetchUserStocks = createSelector(
+    this.getUiReducer,
+    (ui) => ui.refetchUserStocks
+  );
 }
 
 const uiReducerSelector = new UiReducerSelector();

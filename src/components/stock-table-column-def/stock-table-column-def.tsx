@@ -20,14 +20,27 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
       cell: ({ row }) => (
         <div
           className={cn(
-            isMobile
-              ? "max-w-[100px] overflow-hidden	text-ellipsis whitespace-nowrap"
-              : ""
+            "max-w-[100px] overflow-hidden	text-ellipsis whitespace-nowrap"
           )}
         >
           {row.getValue("name")}
         </div>
       ),
+    },
+    {
+      accessorKey: "cost",
+      header: () => <div className="text-right">Cost</div>,
+      cell: ({ row }) => {
+        const amount = row.original.averageCost ?? 0; //parseFloat(row.getValue("lastPrice"));
+
+        // Format the amount as a try amount
+        const formatted = new Intl.NumberFormat("tr-TR", {
+          style: "currency",
+          currency: "TRY",
+        }).format(amount);
+
+        return <div className="text-right font-medium">{formatted}</div>;
+      },
     },
     {
       accessorKey: "lastPrice",
@@ -45,18 +58,65 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
       },
     },
     {
-      accessorKey: "change",
+      accessorKey: "quantity",
+      header: () => <div className="text-right">Quantity</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="text-right font-medium">
+            {row.original.quantity ?? 1}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "profit",
+      header: () => <div className="text-right">Profit</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="text-right font-medium">
+            {row.original.profit ?? 1}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "profitPercentage",
       header: () => (
-        <div className={"max-w-[70px] overflow-hidden whitespace-nowrap"}>
-          Change %
+        <div className="max-w-[100px] overflow-hidden whitespace-nowrap">
+          Profit %
         </div>
       ),
-      cell: ({ row }) => <div>{row.getValue("change")}</div>,
+      cell: ({ row }) => {
+        return (
+          <div className="text-right font-medium">
+            {row.original.profitPercentage?.toFixed(2) + "%" ?? 1}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "change",
+      header: () => (
+        <div className={"max-w-[100px] overflow-hidden whitespace-nowrap"}>
+          D. Change %
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="text-right font-medium">{row.getValue("change")}</div>
+      ),
     },
     {
       accessorKey: "volume",
-      header: "Volume",
-      cell: ({ row }) => <div>{row.getValue("volume")}</div>,
+      header: () => (
+        <div className={"max-w-[100px] overflow-hidden whitespace-nowrap"}>
+          Volume
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="text-right font-medium">
+          {parseFloat(row.original.volume)}m
+        </div>
+      ),
     },
     {
       id: "actions",

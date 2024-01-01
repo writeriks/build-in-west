@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import useSession from "../../hooks/useSession";
+import { useDispatch } from "react-redux";
 
 import { MoreHorizontal, RotateCwIcon } from "lucide-react";
 import {
@@ -12,6 +13,7 @@ import {
 import { Button } from "../ui/button";
 
 import { api } from "../../utils/api";
+import { setShouldRefetchUserStocks } from "../../store/reducers/ui-reducer/ui-slice";
 
 import { type Stock } from "../../types/stock-types";
 
@@ -21,43 +23,23 @@ interface CellActionMenuProps {
 const CellActionMenu: React.FC<CellActionMenuProps> = ({ stock }) => {
   const session = useSession();
 
-  const { data, refetch } = api.stocks.getStocks.useQuery({
-    userId: session ? session?.id : "",
-  });
-
   const [isLoading, setIsLoading] = useState(false);
 
-  const addStocksToWatchlistMutation =
-    api.stocks.addUserStocksToWatchList.useMutation();
+  const dispatch = useDispatch();
+
   const removeStocksToWatchlistMutation =
     api.stocks.removeUserStocksToWatchList.useMutation();
 
   const { id } = stock;
 
-  const updatedStock =
-    data && Object.values(data).find((item) => item.symbol === stock.symbol);
-
-  const toggleFavorite = async (stock: Stock) => {
+  const removeFavorite = async (stock: Stock) => {
     try {
       setIsLoading(true);
-      if (updatedStock) {
-        if (!updatedStock.isFavorite) {
-          await addStocksToWatchlistMutation.mutateAsync({
-            userId: session ? session?.id : "",
-            buyPrice: stock.lastPrice,
-            stockSymbol: stock.symbol,
-            quantitiy: 1,
-            stockName: stock.name,
-          });
-        } else if (updatedStock.isFavorite) {
-          await removeStocksToWatchlistMutation.mutateAsync({
-            userId: session ? session?.id : "",
-            symbol: stock.symbol,
-          });
-        }
-      }
-      console.log("refetching");
-      await refetch();
+      await removeStocksToWatchlistMutation.mutateAsync({
+        userId: session ? session?.id : "",
+        symbol: stock.symbol,
+      });
+      dispatch(setShouldRefetchUserStocks(true));
     } catch (error) {
       console.error(error);
     } finally {
@@ -79,8 +61,8 @@ const CellActionMenu: React.FC<CellActionMenuProps> = ({ stock }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => toggleFavorite(stock)}>
-              {updatedStock?.isFavorite ? "Remove Favorite" : "Add To Favorite"}
+            <DropdownMenuItem onClick={() => removeFavorite(stock)}>
+              Remove Favorite
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(id)}>
               Copy Stock Symbol

@@ -48,6 +48,7 @@ export const stocksRouter = createTRPCRouter({
         );
       }
     }),
+
   addUserStocksToWatchList: publicProcedure
     .input(
       z.object({
@@ -123,6 +124,7 @@ export const stocksRouter = createTRPCRouter({
         });
       }
     }),
+
   removeUserStocksToWatchList: publicProcedure
     .input(
       z.object({
@@ -145,5 +147,19 @@ export const stocksRouter = createTRPCRouter({
           id: stockToDelete?.id,
         },
       });
+    }),
+
+  getUserStocks: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { userId } = input;
+
+      const userStocks = await ctx.prisma.userStock.findMany({
+        where: {
+          userId: userId,
+        },
+      });
+
+      return userStocks;
     }),
 });

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
+import { useDispatch, useSelector } from "react-redux";
 import useSession from "../../hooks/useSession";
 
 import AddStockDialog from "../../components/add-stocks-dialog/add-stocks-dialog";
@@ -10,8 +11,11 @@ import DataTable from "../../components/data-table/data-table";
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
 import { stockTableColumnDef } from "../../components/stock-table-column-def/stock-table-column-def";
 import { api } from "../../utils/api";
+import uiReducerSelector from "../../store/reducers/ui-reducer/ui-reducer-selector";
+import { setShouldRefetchUserStocks } from "../../store/reducers/ui-reducer/ui-slice";
 
 import { type User } from "@prisma/client";
+import { type Stock } from "../../types/stock-types";
 
 const MyPortfolio = ({
   dbUser,
@@ -22,9 +26,93 @@ const MyPortfolio = ({
 }) => {
   const session = useSession();
 
-  const { data, isLoading, error } = api.stocks.getStocks.useQuery({
-    userId: session ? session?.id : "",
-  });
+  const [stocksArray, setStocksArray] = React.useState<Stock[]>([]);
+
+  const dispatch = useDispatch();
+
+  const shouldRefetchUserStocks = useSelector(
+    uiReducerSelector.getShouldRefetchUserStocks
+  );
+
+  const {
+    data: stocks,
+    isRefetching: stocksRefetching,
+    error,
+    refetch: refetchStocks,
+  } = api.stocks.getStocks.useQuery(
+    {
+      userId: session ? session?.id : "",
+    },
+    { enabled: shouldRefetchUserStocks }
+  );
+  const { data: userStocks, refetch: refetchUserStocks } =
+    api.stocks.getUserStocks.useQuery(
+      {
+        userId: session ? session?.id : "",
+      },
+      { enabled: shouldRefetchUserStocks }
+    );
+
+  useEffect(() => {
+    dispatch(setShouldRefetchUserStocks(true));
+  }, [dispatch]);
+
+  useEffect(() => {
+    const fetchUserStocks = async () => {
+      await refetchStocks();
+      await refetchUserStocks();
+      dispatch(setShouldRefetchUserStocks(false));
+    };
+    if (shouldRefetchUserStocks) {
+      void fetchUserStocks();
+    }
+  }, [shouldRefetchUserStocks, refetchUserStocks, dispatch, refetchStocks]);
+
+  useEffect(() => {
+    if (userStocks && stocks) {
+      const array: Stock[] = [];
+
+      userStocks.forEach((userStock) => {
+        const stock = stocks[userStock.symbol];
+
+        array.push({
+          id: stock?.id ?? "",
+          symbol: stock?.symbol ?? "",
+          name: stock?.name ?? "",
+          lastPrice: stock?.lastPrice ?? 0,
+          profit: stock
+            ? parseFloat(
+                (
+                  parseFloat(
+                    (
+                      parseFloat(stock.lastPrice.toFixed(2)) *
+                      userStock.quantity
+                    ).toFixed(2)
+                  ) -
+                  parseFloat(
+                    (
+                      parseFloat(userStock.buyPrice.toFixed(2)) *
+                      userStock.quantity
+                    ).toFixed(2)
+                  )
+                ).toFixed(2)
+              )
+            : 0,
+          profitPercentage: stock
+            ? ((stock?.lastPrice - userStock.buyPrice) / userStock.buyPrice) *
+              100
+            : 0,
+          quantity: userStock.quantity,
+          averageCost: userStock.buyPrice,
+          change: stock?.change ?? "0",
+          volume: stock?.volume ?? "",
+          lastUpdate: stock?.lastUpdate ?? "",
+          isFavorite: true,
+        });
+      });
+      setStocksArray(array);
+    }
+  }, [userStocks, stocks]);
 
   if (error) return <div>{error.message}</div>;
 
@@ -33,13 +121,13 @@ const MyPortfolio = ({
       <div className="h-full w-full bg-yellow-400 p-4">
         <div className="flex w-full flex-row justify-center">
           <div className="w-full md:w-[70%]">
-            <AddStockDialog stocks={data ? Object.values(data) : []} />
+            <AddStockDialog stocks={stocks ? Object.values(stocks) : []} />
             <div>
-              {isLoading ? (
+              {stocksRefetching ? (
                 <Loading />
               ) : (
                 <DataTable
-                  data={Object.values(data)}
+                  data={stocksArray}
                   columnDef={stockTableColumnDef(isMobile)}
                   pageSize={isMobile ? 5 : 8}
                   filtersEnabled

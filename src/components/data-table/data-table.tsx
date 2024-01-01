@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useDeferredValue, useEffect, useState } from "react";
 
 import {
   type ColumnDef,
@@ -27,10 +27,11 @@ import {
   DndContext,
   type DragEndEvent,
   KeyboardSensor,
-  PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
+  TouchSensor,
+  MouseSensor,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -65,16 +66,24 @@ const DataTable: React.FC<DataTableProps> = ({
   selectingEnabled = false,
   pageSize = 10,
 }) => {
-  const [tableData, setTableData] = React.useState<Stock[]>(data);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [isSort, setIsSort] = React.useState<boolean>(false);
+  const [tableData, setTableData] = useState<Stock[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [isSort, setIsSort] = useState<boolean>(false);
 
-  const [globalFilter, setGlobalFilter] = React.useState<string>();
-  const deferredFilter = React.useDeferredValue(globalFilter);
+  const [globalFilter, setGlobalFilter] = useState<string>();
+  const deferredFilter = useDeferredValue(globalFilter);
 
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
+  useEffect(() => {
+    if (
+      JSON.stringify(Object.values(tableData)) !==
+      JSON.stringify(Object.values(data))
+    ) {
+      setTableData(data);
+    }
+  }, [data, tableData]);
 
   const table = useReactTable({
     data: tableData,
@@ -108,7 +117,8 @@ const DataTable: React.FC<DataTableProps> = ({
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(TouchSensor),
+    useSensor(MouseSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })

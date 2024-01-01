@@ -17,6 +17,8 @@ import StockDialogFooter from "./stock-dialog-footer";
 import { api } from "../../utils/api";
 
 import { type Stock } from "../../types/stock-types";
+import { useDispatch } from "react-redux";
+import { setShouldRefetchUserStocks } from "../../store/reducers/ui-reducer/ui-slice";
 interface AddStockModalProps {
   stocks: Stock[];
 }
@@ -33,6 +35,7 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
   const session = useSession();
 
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   const addStocksToWatchlistMutation =
     api.stocks.addUserStocksToWatchList.useMutation({
@@ -131,6 +134,8 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
           quantitiy: quantityInput,
           stockName: selectedStocObject.name,
         });
+        dispatch(setShouldRefetchUserStocks(true));
+        onDialogClose();
       } catch (error) {
         console.error(error);
       }
