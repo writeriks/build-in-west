@@ -123,6 +123,18 @@ export const stocksRouter = createTRPCRouter({
           },
         });
       }
+
+      // Update the user's stocks order
+      await ctx.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          userStocksOrder: `${stockSymbol},${
+            owner?.userStocksOrder ? owner?.userStocksOrder : ""
+          }`,
+        },
+      });
     }),
 
   removeUserStocksToWatchList: publicProcedure
@@ -147,6 +159,25 @@ export const stocksRouter = createTRPCRouter({
           id: stockToDelete?.id,
         },
       });
+
+      const stockOrder = await ctx.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      const newStockOrder = (stockOrder?.userStocksOrder as string)
+        ?.replace(symbol, "")
+        .replace(",,", ",")
+        .replace(/(^,)|(,$)/g, "");
+
+      await ctx.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          userStocksOrder: newStockOrder,
+        },
+      });
     }),
 
   getUserStocks: publicProcedure
@@ -154,12 +185,58 @@ export const stocksRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { userId } = input;
 
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const symbolsOrder: string[] = (user.userStocksOrder as string).split(
+        ","
+      );
+
       const userStocks = await ctx.prisma.userStock.findMany({
         where: {
           userId: userId,
         },
       });
 
-      return userStocks;
+      // Create a map to store user stocks indexed by symbol for quick lookup
+      const userStocksMap = new Map(
+        userStocks.map((stock) => [stock.symbol, stock])
+      );
+
+      // Reorder the user stocks array based on the order of input symbols
+      const reorderedUserStocks = symbolsOrder
+        .map((symbol) => userStocksMap.get(symbol))
+        .filter(Boolean);
+
+      return reorderedUserStocks;
+    }),
+
+  sortUserStocks: publicProcedure
+    .input(
+      z.object({
+        symbols: z.array(z.string()),
+        userId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { symbols, userId } = input;
+
+      const newStockOrder = symbols.join(",");
+
+      await ctx.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          userStocksOrder: newStockOrder,
+        },
+      });
     }),
 });

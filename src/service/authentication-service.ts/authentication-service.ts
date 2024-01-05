@@ -33,6 +33,7 @@ class AuthenticationService {
       email_verified: user.email_verified,
       lastname: "",
       name: user.name,
+      userStocksOrder: "",
       picture: user.picture,
       userType: UserType.AUTH0,
     };
@@ -49,6 +50,7 @@ class AuthenticationService {
         ? `${user.given_name} ${user.middle_name}`
         : user.given_name,
       picture: user.picture,
+      userStocksOrder: "",
       userType: UserType.FACEBOOK,
     };
   };
@@ -60,6 +62,7 @@ class AuthenticationService {
       lastname: user.family_name,
       name: user.given_name,
       picture: user.picture,
+      userStocksOrder: "",
       userType: UserType.GOOGLE,
     };
   };

@@ -9,18 +9,18 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
   return [
     {
       accessorKey: "symbol",
-      header: "Symbol",
+      header: () => <div className="text-center">Symbol</div>,
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("symbol")}</div>
+        <div className="text-center capitalize">{row.getValue("symbol")}</div>
       ),
     },
     {
       accessorKey: "name",
-      header: "Name",
+      header: () => <div className="text-center">Name</div>,
       cell: ({ row }) => (
         <div
           className={cn(
-            "max-w-[100px] overflow-hidden	text-ellipsis whitespace-nowrap"
+            "max-w-[100px] overflow-hidden text-ellipsis whitespace-nowrap text-center"
           )}
         >
           {row.getValue("name")}
@@ -29,7 +29,7 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
     },
     {
       accessorKey: "cost",
-      header: () => <div className="text-right">Cost</div>,
+      header: () => <div className="text-center">Cost</div>,
       cell: ({ row }) => {
         const amount = row.original.averageCost ?? 0; //parseFloat(row.getValue("lastPrice"));
 
@@ -39,12 +39,12 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
           currency: "TRY",
         }).format(amount);
 
-        return <div className="text-right font-medium">{formatted}</div>;
+        return <div className="text-center font-medium">{formatted}</div>;
       },
     },
     {
       accessorKey: "lastPrice",
-      header: () => <div className="text-right">Price</div>,
+      header: () => <div className="text-center">Price</div>,
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue("lastPrice"));
 
@@ -54,15 +54,15 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
           currency: "TRY",
         }).format(amount);
 
-        return <div className="text-right font-medium">{formatted}</div>;
+        return <div className="text-center font-medium">{formatted}</div>;
       },
     },
     {
       accessorKey: "quantity",
-      header: () => <div className="text-right">Quantity</div>,
+      header: () => <div className="text-center">Quantity</div>,
       cell: ({ row }) => {
         return (
-          <div className="text-right font-medium">
+          <div className="text-center font-medium">
             {row.original.quantity ?? 1}
           </div>
         );
@@ -70,10 +70,10 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
     },
     {
       accessorKey: "profit",
-      header: () => <div className="text-right">Profit</div>,
+      header: () => <div className="text-center">Profit</div>,
       cell: ({ row }) => {
         return (
-          <div className="text-right font-medium">
+          <div className="text-center font-medium">
             {row.original.profit ?? 1}
           </div>
         );
@@ -82,13 +82,13 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
     {
       accessorKey: "profitPercentage",
       header: () => (
-        <div className="max-w-[100px] overflow-hidden whitespace-nowrap">
+        <div className="max-w-[100px] overflow-hidden whitespace-nowrap text-center">
           Profit %
         </div>
       ),
       cell: ({ row }) => {
         return (
-          <div className="text-right font-medium">
+          <div className="text-center font-medium">
             {row.original.profitPercentage?.toFixed(2) + "%" ?? 1}
           </div>
         );
@@ -97,23 +97,31 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
     {
       accessorKey: "change",
       header: () => (
-        <div className={"max-w-[100px] overflow-hidden whitespace-nowrap"}>
+        <div
+          className={
+            "max-w-[100px] overflow-hidden whitespace-nowrap text-center"
+          }
+        >
           D. Change %
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-right font-medium">{row.getValue("change")}</div>
+        <div className="text-center font-medium">{row.getValue("change")}</div>
       ),
     },
     {
       accessorKey: "volume",
       header: () => (
-        <div className={"max-w-[100px] overflow-hidden whitespace-nowrap"}>
+        <div
+          className={
+            "max-w-[100px] overflow-hidden whitespace-nowrap text-center"
+          }
+        >
           Volume
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-right font-medium">
+        <div className="text-center font-medium">
           {parseFloat(row.original.volume)}m
         </div>
       ),

@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 
 import { useDispatch, useSelector } from "react-redux";
-import useSession from "../../hooks/useSession";
 
 import AddStockDialog from "../../components/add-stocks-dialog/add-stocks-dialog";
 import Loading from "../../components/common/loading/loading";
@@ -24,8 +23,6 @@ const MyPortfolio = ({
   dbUser: User;
   isMobile: boolean;
 }) => {
-  const session = useSession();
-
   const [stocksArray, setStocksArray] = React.useState<Stock[]>([]);
 
   const dispatch = useDispatch();
@@ -41,17 +38,20 @@ const MyPortfolio = ({
     refetch: refetchStocks,
   } = api.stocks.getStocks.useQuery(
     {
-      userId: session ? session?.id : "",
+      userId: dbUser.id,
     },
     { enabled: shouldRefetchUserStocks }
   );
   const { data: userStocks, refetch: refetchUserStocks } =
     api.stocks.getUserStocks.useQuery(
       {
-        userId: session ? session?.id : "",
+        userId: dbUser.id,
       },
       { enabled: shouldRefetchUserStocks }
     );
+
+  console.log("🚀 ~ file: index.tsx:46 ~ userStocks:", userStocks);
+  const sortUserStockOrder = api.stocks.sortUserStocks.useMutation();
 
   useEffect(() => {
     dispatch(setShouldRefetchUserStocks(true));
@@ -73,8 +73,7 @@ const MyPortfolio = ({
       const array: Stock[] = [];
 
       userStocks.forEach((userStock) => {
-        const stock = stocks[userStock.symbol];
-
+        const stock = stocks[userStock!.symbol];
         array.push({
           id: stock?.id ?? "",
           symbol: stock?.symbol ?? "",
@@ -86,24 +85,24 @@ const MyPortfolio = ({
                   parseFloat(
                     (
                       parseFloat(stock.lastPrice.toFixed(2)) *
-                      userStock.quantity
+                      userStock!.quantity
                     ).toFixed(2)
                   ) -
                   parseFloat(
                     (
-                      parseFloat(userStock.buyPrice.toFixed(2)) *
-                      userStock.quantity
+                      parseFloat(userStock!.buyPrice.toFixed(2)) *
+                      userStock!.quantity
                     ).toFixed(2)
                   )
                 ).toFixed(2)
               )
             : 0,
           profitPercentage: stock
-            ? ((stock?.lastPrice - userStock.buyPrice) / userStock.buyPrice) *
+            ? ((stock?.lastPrice - userStock!.buyPrice) / userStock!.buyPrice) *
               100
             : 0,
-          quantity: userStock.quantity,
-          averageCost: userStock.buyPrice,
+          quantity: userStock!.quantity,
+          averageCost: userStock!.buyPrice,
           change: stock?.change ?? "0",
           volume: stock?.volume ?? "",
           lastUpdate: stock?.lastUpdate ?? "",
@@ -114,10 +113,13 @@ const MyPortfolio = ({
     }
   }, [userStocks, stocks]);
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const handleSortingOver = async (sortedArray: Stock[]) => {
-    console.log("🚀 ~ SAVE TO DB:", sortedArray);
-    // TODO: Save the order of stocksData to DB
+    const stockOrder = sortedArray.map((stock) => stock.symbol);
+
+    await sortUserStockOrder.mutateAsync({
+      userId: dbUser.id,
+      symbols: stockOrder,
+    });
   };
 
   if (error) return <div>{error.message}</div>;
