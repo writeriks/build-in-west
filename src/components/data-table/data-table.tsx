@@ -52,6 +52,8 @@ export type Payment = {
 
 interface DataTableProps {
   data: any[];
+  setDataOnDragEnd: (data: any[]) => void;
+  handleSortingOver: (data: any[]) => Promise<void>;
   columnDef: ColumnDef<any>[];
   pageSize?: number;
   sortingEnabled?: boolean;
@@ -61,12 +63,15 @@ interface DataTableProps {
 
 const DataTable: React.FC<DataTableProps> = ({
   data,
+  setDataOnDragEnd,
+  handleSortingOver,
   columnDef,
   filtersEnabled = false,
   selectingEnabled = false,
   pageSize = 10,
 }) => {
   const [tableData, setTableData] = useState<Stock[]>([]);
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isSort, setIsSort] = useState<boolean>(false);
 
@@ -79,11 +84,12 @@ const DataTable: React.FC<DataTableProps> = ({
   useEffect(() => {
     if (
       JSON.stringify(Object.values(tableData)) !==
-      JSON.stringify(Object.values(data))
+        JSON.stringify(Object.values(data)) &&
+      !isSort
     ) {
       setTableData(data);
     }
-  }, [data, tableData]);
+  }, [data, tableData, isSort]);
 
   const table = useReactTable({
     data: tableData,
@@ -108,10 +114,9 @@ const DataTable: React.FC<DataTableProps> = ({
     table.setPageSize(pageSize);
   }, [table, pageSize]);
 
-  const handleSort = (isSort: boolean) => {
+  const handleSort = async (isSort: boolean) => {
     if (isSort) {
-      console.log("🚀 ~ SAVING ~ stocksData:");
-      // TODO: Save the order of stocksData to DB
+      await handleSortingOver(tableData);
     }
     setIsSort(!isSort);
   };
@@ -131,15 +136,16 @@ const DataTable: React.FC<DataTableProps> = ({
       return;
     }
 
+    let sortedArray: any[] = [];
     if (active.id !== over.id) {
-      setTableData((tableData) => {
-        const oldIndex = tableData.findIndex(
-          (data) => data.symbol === active.id
-        );
-        const newIndex = tableData.findIndex((data) => data.symbol === over.id);
-        return arrayMove(tableData, oldIndex, newIndex);
-      });
+      const oldIndex = tableData.findIndex((data) => data.symbol === active.id);
+      const newIndex = tableData.findIndex((data) => data.symbol === over.id);
+      sortedArray = arrayMove(tableData, oldIndex, newIndex);
+
+      setTableData(sortedArray);
     }
+
+    setDataOnDragEnd(sortedArray);
   };
 
   return (

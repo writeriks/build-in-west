@@ -114,6 +114,12 @@ const MyPortfolio = ({
     }
   }, [userStocks, stocks]);
 
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const handleSortingOver = async (sortedArray: Stock[]) => {
+    console.log("🚀 ~ SAVE TO DB:", sortedArray);
+    // TODO: Save the order of stocksData to DB
+  };
+
   if (error) return <div>{error.message}</div>;
 
   return (
@@ -128,7 +134,11 @@ const MyPortfolio = ({
               ) : (
                 <DataTable
                   data={stocksArray}
+                  setDataOnDragEnd={(array) => setStocksArray(array)}
                   columnDef={stockTableColumnDef(isMobile)}
+                  handleSortingOver={(array) =>
+                    handleSortingOver(array as Stock[])
+                  }
                   pageSize={isMobile ? 5 : 8}
                   filtersEnabled
                   sortingEnabled
