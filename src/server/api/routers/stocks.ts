@@ -165,7 +165,7 @@ export const stocksRouter = createTRPCRouter({
           id: userId,
         },
       });
-      const newStockOrder = (stockOrder?.userStocksOrder as string)
+      const newStockOrder = stockOrder?.userStocksOrder
         ?.replace(symbol, "")
         .replace(",,", ",")
         .replace(/(^,)|(,$)/g, "");
@@ -195,9 +195,7 @@ export const stocksRouter = createTRPCRouter({
         throw new Error("User not found");
       }
 
-      const symbolsOrder: string[] = (user.userStocksOrder as string).split(
-        ","
-      );
+      const symbolsOrder: string[] = user.userStocksOrder.split(",");
 
       const userStocks = await ctx.prisma.userStock.findMany({
         where: {
