@@ -13,6 +13,7 @@ export const userRouter = createTRPCRouter({
         name: z.string(),
         lastname: z.string(),
         picture: z.string(),
+        userStocksOrder: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -27,10 +28,9 @@ export const userRouter = createTRPCRouter({
         return;
       }
 
+      /* const user = {...input}; */
       return ctx.prisma.user.create({
-        data: {
-          ...input,
-        },
+        data: input,
       });
     }),
   getUser: publicProcedure
