@@ -21,6 +21,7 @@ import DataTableRow from "../data-table-row/data-table-row";
 import { TableBody, TableCell, TableRow } from "../../ui/table";
 import { type Stock } from "../../../types/stock-types";
 import Loading from "../../common/loading/loading";
+import TableEmptyRow from "../table-empty-row/table-empty-row";
 
 interface DataTableBodyProps {
   table: Table<any>;
@@ -107,11 +108,7 @@ const DataTableBody: React.FC<DataTableBodyProps> = ({
             </SortableContext>
           </DndContext>
         ) : (
-          <TableRow>
-            <TableCell colSpan={columnDef.length} className="h-24 text-center">
-              No results.
-            </TableCell>
-          </TableRow>
+          <TableEmptyRow />
         )}
       </TableBody>
     </>
