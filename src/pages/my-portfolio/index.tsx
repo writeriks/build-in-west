@@ -4,7 +4,6 @@ import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { useDispatch, useSelector } from "react-redux";
 
 import AddStockDialog from "../../components/add-stocks-dialog/add-stocks-dialog";
-import Loading from "../../components/common/loading/loading";
 import DataTable from "../../components/data-table/data-table";
 
 import authenticationService from "../../service/authentication-service.ts/authentication-service";
@@ -24,6 +23,7 @@ const MyPortfolio = ({
   isMobile: boolean;
 }) => {
   const [stocksArray, setStocksArray] = React.useState<Stock[]>([]);
+  const [loadingStocks, setLoadingStocks] = React.useState<boolean>(true);
 
   const dispatch = useDispatch();
 
@@ -50,7 +50,6 @@ const MyPortfolio = ({
       { enabled: shouldRefetchUserStocks }
     );
 
-  console.log("🚀 ~ file: index.tsx:46 ~ userStocks:", userStocks);
   const sortUserStockOrder = api.stocks.sortUserStocks.useMutation();
 
   useEffect(() => {
@@ -110,6 +109,7 @@ const MyPortfolio = ({
         });
       });
       setStocksArray(array);
+      setLoadingStocks(false);
     }
   }, [userStocks, stocks]);
 
@@ -131,21 +131,18 @@ const MyPortfolio = ({
           <div className="w-full md:w-[70%]">
             <AddStockDialog stocks={stocks ? Object.values(stocks) : []} />
             <div>
-              {stocksRefetching ? (
-                <Loading />
-              ) : (
-                <DataTable
-                  data={stocksArray}
-                  setDataOnDragEnd={(array) => setStocksArray(array)}
-                  columnDef={stockTableColumnDef(isMobile)}
-                  handleSortingOver={(array) =>
-                    handleSortingOver(array as Stock[])
-                  }
-                  pageSize={isMobile ? 5 : 8}
-                  filtersEnabled
-                  sortingEnabled
-                />
-              )}
+              <DataTable
+                data={stocksArray}
+                setDataOnDragEnd={(array) => setStocksArray(array)}
+                columnDef={stockTableColumnDef(isMobile)}
+                handleSortingOver={(array) =>
+                  handleSortingOver(array as Stock[])
+                }
+                pageSize={isMobile ? 5 : 8}
+                filtersEnabled
+                sortingEnabled
+                isLoading={loadingStocks || stocksRefetching}
+              />
             </div>
           </div>
         </div>

@@ -12,36 +12,14 @@ import {
   useReactTable,
   type Table as DataTable,
 } from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import GlobalSearch from "./global-search/global-search";
 import Pagination from "./pagination/pagination";
 
-import {
-  DndContext,
-  type DragEndEvent,
-  KeyboardSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  TouchSensor,
-  MouseSensor,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  verticalListSortingStrategy,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
-
 import { type Stock } from "../../types/stock-types";
-import DataTableRow from "./data-table-row/data-table-row";
+
+import DataTableBody from "./data-table-body/data-table-body";
+import DataTableHeader from "./data-table-header/data-table-header";
 
 export type Payment = {
   id: string;
@@ -59,6 +37,7 @@ interface DataTableProps {
   sortingEnabled?: boolean;
   filtersEnabled?: boolean;
   selectingEnabled?: boolean;
+  isLoading: boolean;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -69,6 +48,7 @@ const DataTable: React.FC<DataTableProps> = ({
   filtersEnabled = false,
   selectingEnabled = false,
   pageSize = 10,
+  isLoading,
 }) => {
   const [tableData, setTableData] = useState<Stock[]>([]);
 
@@ -121,33 +101,6 @@ const DataTable: React.FC<DataTableProps> = ({
     setIsSort(!isSort);
   };
 
-  const sensors = useSensors(
-    useSensor(TouchSensor),
-    useSensor(MouseSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over) {
-      return;
-    }
-
-    let sortedArray: any[] = [];
-    if (active.id !== over.id) {
-      const oldIndex = tableData.findIndex((data) => data.symbol === active.id);
-      const newIndex = tableData.findIndex((data) => data.symbol === over.id);
-      sortedArray = arrayMove(tableData, oldIndex, newIndex);
-
-      setTableData(sortedArray);
-    }
-
-    setDataOnDragEnd(sortedArray);
-  };
-
   return (
     <div className="w-full">
       <GlobalSearch
@@ -159,62 +112,17 @@ const DataTable: React.FC<DataTableProps> = ({
       />
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
+          <DataTableHeader table={table} />
 
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={tableData}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {table.getRowModel().rows.map((row) => (
-                    <DataTableRow
-                      key={row.id}
-                      row={row}
-                      item={
-                        tableData.find(
-                          (item) =>
-                            item.symbol === (row.original as Stock).symbol
-                        )!
-                      }
-                      isSort={isSort}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columnDef.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+          <DataTableBody
+            columnDef={columnDef}
+            isLoading={isLoading}
+            isSort={isSort}
+            setDataOnDragEnd={setDataOnDragEnd}
+            setTableData={setTableData}
+            table={table}
+            tableData={tableData}
+          />
         </Table>
       </div>
       <Pagination table={table} selectingEnabled={selectingEnabled} />

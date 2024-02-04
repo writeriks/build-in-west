@@ -11,7 +11,9 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
       accessorKey: "symbol",
       header: () => <div className="text-center">Symbol</div>,
       cell: ({ row }) => (
-        <div className="text-center capitalize">{row.getValue("symbol")}</div>
+        <div className="text-center font-bold capitalize">
+          {row.getValue("symbol")}
+        </div>
       ),
     },
     {
@@ -72,9 +74,22 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
       accessorKey: "profit",
       header: () => <div className="text-center">Profit</div>,
       cell: ({ row }) => {
+        const profit = parseFloat(row.getValue("profit"));
+
+        // Format the amount as a try amount
+        const formattedProfit = new Intl.NumberFormat("tr-TR", {
+          style: "currency",
+          currency: "TRY",
+        }).format(profit);
+
         return (
-          <div className="text-center font-medium">
-            {row.original.profit ?? 1}
+          <div
+            className={cn(
+              "text-center font-medium",
+              profit >= 0 ? "text-green-700" : "text-red-700"
+            )}
+          >
+            {formattedProfit}
           </div>
         );
       },
@@ -87,9 +102,15 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
         </div>
       ),
       cell: ({ row }) => {
+        const profitPercentage = parseFloat(row.getValue("profitPercentage"));
         return (
-          <div className="text-center font-medium">
-            {row.original.profitPercentage?.toFixed(2) + "%" ?? 1}
+          <div
+            className={cn(
+              "text-center font-medium",
+              profitPercentage >= 0 ? "text-green-700" : "text-red-700"
+            )}
+          >
+            {profitPercentage?.toFixed(2) + "%" ?? 1}
           </div>
         );
       },
@@ -105,9 +126,22 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
           D. Change %
         </div>
       ),
-      cell: ({ row }) => (
-        <div className="text-center font-medium">{row.getValue("change")}</div>
-      ),
+      cell: ({ row }) => {
+        const dailyChangeString: string = row.getValue("change");
+        const dailyChange = dailyChangeString.replace(",", ".");
+        const dailyChangeNumber = parseFloat(dailyChange);
+
+        return (
+          <div
+            className={cn(
+              "text-center font-medium",
+              dailyChangeNumber >= 0 ? "text-green-700" : "text-red-700"
+            )}
+          >
+            {dailyChangeNumber.toFixed(2)}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "volume",

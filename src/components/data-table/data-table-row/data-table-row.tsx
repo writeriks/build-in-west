@@ -4,18 +4,17 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { flexRender, type Row } from "@tanstack/react-table";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { type Stock } from "../../../types/stock-types";
 
 interface DataTableRowProps {
   row: Row<any>;
   isSort: boolean;
-  item: Stock;
+  item: { id: string };
 }
 
 const DataTableRow: React.FC<DataTableRowProps> = ({ row, isSort, item }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
-      id: item.symbol,
+      id: item.id,
       disabled: !isSort,
       transition: null,
     });
