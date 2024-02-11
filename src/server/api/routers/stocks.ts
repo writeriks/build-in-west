@@ -75,6 +75,7 @@ export const stocksRouter = createTRPCRouter({
         },
       });
 
+      // If the stock does not exist in the database, create it
       if (!stock) {
         stock = await ctx.prisma.stock.create({
           data: {
@@ -122,19 +123,19 @@ export const stocksRouter = createTRPCRouter({
             },
           },
         });
-      }
 
-      // Update the user's stocks order
-      await ctx.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          userStocksOrder: `${stockSymbol},${
-            owner?.userStocksOrder ? owner?.userStocksOrder : ""
-          }`,
-        },
-      });
+        // Update the user's stocks order
+        await ctx.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            userStocksOrder: `${stockSymbol},${
+              owner?.userStocksOrder ? owner?.userStocksOrder : ""
+            }`,
+          },
+        });
+      }
     }),
 
   removeUserStocksToWatchList: publicProcedure

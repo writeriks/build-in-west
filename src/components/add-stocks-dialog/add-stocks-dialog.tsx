@@ -19,6 +19,11 @@ import { api } from "../../utils/api";
 import { type Stock } from "../../types/stock-types";
 import { useDispatch } from "react-redux";
 import { setShouldRefetchUserStocks } from "../../store/reducers/ui-reducer/ui-slice";
+import {
+  calculateTotalBuyAmount,
+  filterDropdownData,
+  transformStockstoDropdownData,
+} from "./add-stocks-dialog-helper";
 interface AddStockModalProps {
   stocks: Stock[];
 }
@@ -48,11 +53,7 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
     });
 
   const transformedStocks = useMemo(
-    () =>
-      stocks.map((stock) => ({
-        label: `${stock.symbol} ${stock.name}`,
-        value: stock.symbol,
-      })),
+    () => transformStockstoDropdownData(stocks),
     [stocks]
   );
 
@@ -60,26 +61,14 @@ const AddStockDialog: React.FC<AddStockModalProps> = ({ stocks }) => {
     if (!inputValue) {
       return null;
     }
-    return transformedStocks
-      .filter((stock) =>
-        stock.label.toUpperCase().includes(inputValue.toUpperCase())
-      )
-      .slice(0, 5);
+    return filterDropdownData(transformedStocks, inputValue).slice(0, 5);
   }, [inputValue, transformedStocks]);
 
-  const calculatedAmount = useMemo(() => {
-    if (!selectedStocObject?.lastPrice) {
-      return 0;
-    }
-
-    let amount = 0;
-    if (stockPrice > 0) {
-      amount = stockPrice * quantityInput;
-    } else {
-      amount = Number(selectedStocObject?.lastPrice) * quantityInput;
-    }
-    return parseFloat(amount.toFixed(2));
-  }, [quantityInput, selectedStocObject?.lastPrice, stockPrice]);
+  const calculatedAmount = useMemo(
+    () =>
+      calculateTotalBuyAmount(selectedStocObject!, stockPrice, quantityInput),
+    [quantityInput, selectedStocObject, stockPrice]
+  );
 
   const debouncedStocks = useDeferredValue(filteredStocks);
 
