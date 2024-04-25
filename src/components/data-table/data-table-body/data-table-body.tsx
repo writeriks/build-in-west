@@ -61,6 +61,7 @@ const DataTableBody: React.FC<DataTableBodyProps> = ({
     if (active.id !== over.id) {
       const oldIndex = tableData.findIndex((data) => data.id === active.id);
       const newIndex = tableData.findIndex((data) => data.id === over.id);
+
       sortedArray = arrayMove(tableData, oldIndex, newIndex);
 
       setTableData(sortedArray);
@@ -72,18 +73,14 @@ const DataTableBody: React.FC<DataTableBodyProps> = ({
   return (
     <>
       <TableBody>
-        {/* <TableRow>
-          <TableCell colSpan={columnDef.length} className="h-48 text-center">
-            <Loading />
-          </TableCell>
-        </TableRow>  */}
-        {isLoading ? (
+        {/* {isLoading ? (
           <TableRow>
             <TableCell colSpan={columnDef.length} className="h-24 text-center">
               <Loading />
             </TableCell>
           </TableRow>
-        ) : table.getRowModel().rows?.length ? (
+        ) :  */}
+        {table.getRowModel().rows?.length ? (
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

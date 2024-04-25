@@ -5,7 +5,7 @@ import { cn } from "../../lib/utils";
 import { type ColumnDef } from "@tanstack/react-table";
 import { type Stock } from "../../types/stock-types";
 
-export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
+export const stockTableColumnDef = (): ColumnDef<Stock>[] => {
   return [
     {
       accessorKey: "symbol",
@@ -33,7 +33,7 @@ export const stockTableColumnDef = (isMobile: boolean): ColumnDef<Stock>[] => {
       accessorKey: "cost",
       header: () => <div className="text-center">Cost</div>,
       cell: ({ row }) => {
-        const amount = row.original.averageCost ?? 0; //parseFloat(row.getValue("lastPrice"));
+        const amount = row.original.averageCost ?? 0;
 
         // Format the amount as a try amount
         const formatted = new Intl.NumberFormat("tr-TR", {

@@ -14,13 +14,14 @@ import { setShouldRefetchUserStocks } from "../../store/reducers/ui-reducer/ui-s
 
 import { type User } from "@prisma/client";
 import { type Stock } from "../../types/stock-types";
+import useProcessedStocks from "../../hooks/use-processed-stocks";
 
 const MyPortfolio = ({
   dbUser,
-  isMobile,
+  isMobileOS,
 }: {
   dbUser: User;
-  isMobile: boolean;
+  isMobileOS: boolean;
 }) => {
   const [stocksArray, setStocksArray] = React.useState<Stock[]>([]);
   const [loadingStocks, setLoadingStocks] = React.useState<boolean>(true);
@@ -67,51 +68,7 @@ const MyPortfolio = ({
     }
   }, [shouldRefetchUserStocks, refetchUserStocks, dispatch, refetchStocks]);
 
-  useEffect(() => {
-    if (userStocks && stocks) {
-      const array: Stock[] = [];
-
-      userStocks.forEach((userStock) => {
-        const stock = stocks[userStock!.symbol];
-        array.push({
-          id: stock?.id ?? "",
-          symbol: stock?.symbol ?? "",
-          name: stock?.name ?? "",
-          lastPrice: stock?.lastPrice ?? 0,
-          profit: stock
-            ? parseFloat(
-                (
-                  parseFloat(
-                    (
-                      parseFloat(stock.lastPrice.toFixed(2)) *
-                      userStock!.quantity
-                    ).toFixed(2)
-                  ) -
-                  parseFloat(
-                    (
-                      parseFloat(userStock!.buyPrice.toFixed(2)) *
-                      userStock!.quantity
-                    ).toFixed(2)
-                  )
-                ).toFixed(2)
-              )
-            : 0,
-          profitPercentage: stock
-            ? ((stock?.lastPrice - userStock!.buyPrice) / userStock!.buyPrice) *
-              100
-            : 0,
-          quantity: userStock!.quantity,
-          averageCost: userStock!.buyPrice,
-          change: stock?.change ?? "0",
-          volume: stock?.volume ?? "",
-          lastUpdate: stock?.lastUpdate ?? "",
-          isFavorite: true,
-        });
-      });
-      setStocksArray(array);
-      setLoadingStocks(false);
-    }
-  }, [userStocks, stocks]);
+  useProcessedStocks(setLoadingStocks, setStocksArray, userStocks, stocks);
 
   const handleSortingOver = async (sortedArray: Stock[]) => {
     const stockOrder = sortedArray.map((stock) => stock.symbol);
@@ -134,11 +91,11 @@ const MyPortfolio = ({
               <DataTable
                 data={stocksArray}
                 setDataOnDragEnd={(array) => setStocksArray(array)}
-                columnDef={stockTableColumnDef(isMobile)}
+                columnDef={stockTableColumnDef()}
                 handleSortingOver={(array) =>
                   handleSortingOver(array as Stock[])
                 }
-                pageSize={isMobile ? 5 : 8}
+                pageSize={isMobileOS ? 5 : 8}
                 filtersEnabled
                 sortingEnabled
                 isLoading={loadingStocks || stocksRefetching}
@@ -171,7 +128,7 @@ export const getServerSideProps = withPageAuthRequired({
     return {
       props: {
         dbUser: JSON.parse(JSON.stringify(dbUser)) as User,
-        isMobile: isMobile,
+        isMobileOS: isMobile,
       },
     };
   },

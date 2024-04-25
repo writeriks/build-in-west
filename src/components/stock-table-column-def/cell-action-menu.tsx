@@ -62,7 +62,7 @@ const CellActionMenu: React.FC<CellActionMenuProps> = ({ stock }) => {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => removeFavorite(stock)}>
-              Remove Favorite
+              Remove From Watchlist
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(id)}>
               Copy Stock Symbol

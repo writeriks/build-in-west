@@ -211,7 +211,7 @@ export const stocksRouter = createTRPCRouter({
 
       // Reorder the user stocks array based on the order of input symbols
       const reorderedUserStocks = symbolsOrder
-        .map((symbol) => userStocksMap.get(symbol))
+        .map((symbol) => userStocksMap.get(symbol)!)
         .filter(Boolean);
 
       return reorderedUserStocks;
