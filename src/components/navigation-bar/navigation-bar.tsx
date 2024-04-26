@@ -15,7 +15,6 @@ const NavigationBar = () => {
   const { user, isLoading, error } = useUser();
 
   const isAdmin = useSelector(contextReducerSelector.getIsAdminUser);
-  console.log("🚀 ~ NavigationBar ~ isAdmin:", isAdmin);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;

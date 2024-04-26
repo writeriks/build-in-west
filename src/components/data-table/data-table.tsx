@@ -4,7 +4,6 @@ import {
   type ColumnDef,
   type SortingState,
   type VisibilityState,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -12,7 +11,7 @@ import {
   useReactTable,
   type Table as DataTable,
 } from "@tanstack/react-table";
-import { Table, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table } from "@/components/ui/table";
 import GlobalSearch from "./global-search/global-search";
 import Pagination from "./pagination/pagination";
 

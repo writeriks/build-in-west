@@ -18,9 +18,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import DataTableRow from "../data-table-row/data-table-row";
-import { TableBody, TableCell, TableRow } from "../../ui/table";
+import { TableBody } from "../../ui/table";
 import { type Stock } from "../../../types/stock-types";
-import Loading from "../../common/loading/loading";
 import TableEmptyRow from "../table-empty-row/table-empty-row";
 
 interface DataTableBodyProps {
@@ -36,11 +35,9 @@ interface DataTableBodyProps {
 const DataTableBody: React.FC<DataTableBodyProps> = ({
   table,
   tableData,
-  columnDef,
   isSort,
   setTableData,
   setDataOnDragEnd,
-  isLoading,
 }) => {
   const sensors = useSensors(
     useSensor(TouchSensor),
