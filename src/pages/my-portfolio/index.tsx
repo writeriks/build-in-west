@@ -15,6 +15,7 @@ import { setShouldRefetchUserStocks } from "../../store/reducers/ui-reducer/ui-s
 import { type User } from "@prisma/client";
 import { type Stock } from "../../types/stock-types";
 import useProcessedStocks from "../../hooks/use-processed-stocks";
+import useSetAdminUser from "../../hooks/use-set-admin-user";
 
 const MyPortfolio = ({
   dbUser,
@@ -27,6 +28,8 @@ const MyPortfolio = ({
   const [loadingStocks, setLoadingStocks] = React.useState<boolean>(true);
 
   const dispatch = useDispatch();
+
+  useSetAdminUser(dbUser);
 
   const shouldRefetchUserStocks = useSelector(
     uiReducerSelector.getShouldRefetchUserStocks

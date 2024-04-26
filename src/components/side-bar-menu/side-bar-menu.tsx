@@ -17,8 +17,8 @@ const SideBarMenu: React.FC<SideBarMenuProps> = ({ isHamburgerMenuOpen }) => (
         </a>
       </li>
       <li>
-        <a href="/my-expenses" className="text-white">
-          My Expenses
+        <a href="/my-finance" className="text-white">
+          My Finance
         </a>
       </li>
       <li>

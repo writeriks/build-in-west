@@ -36,6 +36,7 @@ class AuthenticationService {
       userStocksOrder: "",
       picture: user.picture,
       userType: UserType.AUTH0,
+      isAdmin: user.isAdmin,
     };
   };
 
@@ -52,6 +53,7 @@ class AuthenticationService {
       picture: user.picture,
       userStocksOrder: "",
       userType: UserType.FACEBOOK,
+      isAdmin: user.isAdmin,
     };
   };
 
@@ -64,6 +66,7 @@ class AuthenticationService {
       picture: user.picture,
       userStocksOrder: "",
       userType: UserType.GOOGLE,
+      isAdmin: user.isAdmin,
     };
   };
 

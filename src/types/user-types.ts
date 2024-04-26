@@ -14,6 +14,7 @@ export interface Auth0User extends UserProfile {
   picture: string;
   sub: string;
   updated_at: string;
+  isAdmin: boolean;
 }
 export interface FacebookUser extends UserProfile {
   email: string;
@@ -27,6 +28,7 @@ export interface FacebookUser extends UserProfile {
   sid: string;
   sub: string;
   updated_at: string;
+  isAdmin: boolean;
 }
 export interface GoogleUser extends UserProfile {
   given_name: string;
@@ -40,6 +42,7 @@ export interface GoogleUser extends UserProfile {
   email_verified: boolean;
   sub: string;
   sid: string;
+  isAdmin: boolean;
 }
 
 export type DatabaseUser = Auth0User | FacebookUser | UserProfile;

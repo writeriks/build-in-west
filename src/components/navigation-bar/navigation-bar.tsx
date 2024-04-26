@@ -4,6 +4,7 @@ import uiReducerSelector from "../../store/reducers/ui-reducer/ui-reducer-select
 import { toggleHamburgerMenu } from "../../store/reducers/ui-reducer/ui-slice";
 import Image from "next/image";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import contextReducerSelector from "../../store/reducers/context-slice/context-slice-selector";
 
 const NavigationBar = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,9 @@ const NavigationBar = () => {
   );
 
   const { user, isLoading, error } = useUser();
+
+  const isAdmin = useSelector(contextReducerSelector.getIsAdminUser);
+  console.log("🚀 ~ NavigationBar ~ isAdmin:", isAdmin);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
@@ -64,14 +68,16 @@ const NavigationBar = () => {
         </div>
 
         <div className={`hidden space-x-4 md:flex`}>
-          <a href="/my-portfolio" className="text-md text-white">
+          <a href="/" className="text-md text-white">
             {user?.name}
           </a>
-          <a href="/my-portfolio" className="text-md text-white">
-            My Portfolio
-          </a>
-          <a href="/my-expenses" className="text-md text-white">
-            My Expenses
+          {isAdmin ? (
+            <a href="/my-portfolio" className="text-md text-white">
+              My Portfolio
+            </a>
+          ) : null}
+          <a href="/my-finance" className="text-md text-white">
+            My Finance
           </a>
           <a href="/api/auth/logout" className="text-md text-white">
             Logout
