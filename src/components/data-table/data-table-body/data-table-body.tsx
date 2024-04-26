@@ -19,7 +19,6 @@ import {
 } from "@dnd-kit/sortable";
 import DataTableRow from "../data-table-row/data-table-row";
 import { TableBody } from "../../ui/table";
-import { type Stock } from "../../../types/stock-types";
 import TableEmptyRow from "../table-empty-row/table-empty-row";
 
 interface DataTableBodyProps {
@@ -70,13 +69,6 @@ const DataTableBody: React.FC<DataTableBodyProps> = ({
   return (
     <>
       <TableBody>
-        {/* {isLoading ? (
-          <TableRow>
-            <TableCell colSpan={columnDef.length} className="h-24 text-center">
-              <Loading />
-            </TableCell>
-          </TableRow>
-        ) :  */}
         {table.getRowModel().rows?.length ? (
           <DndContext
             sensors={sensors}
@@ -92,9 +84,8 @@ const DataTableBody: React.FC<DataTableBodyProps> = ({
                   key={row.id}
                   row={row}
                   item={
-                    tableData.find(
-                      (item) => item.id === (row.original as Stock).id
-                    )!
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    tableData.find((item) => item.id === row.original.id)!
                   }
                   isSort={isSort}
                 />

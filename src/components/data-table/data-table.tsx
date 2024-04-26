@@ -15,8 +15,6 @@ import { Table } from "@/components/ui/table";
 import GlobalSearch from "./global-search/global-search";
 import Pagination from "./pagination/pagination";
 
-import { type Stock } from "../../types/stock-types";
-
 import DataTableBody from "./data-table-body/data-table-body";
 import DataTableHeader from "./data-table-header/data-table-header";
 
@@ -49,7 +47,7 @@ const DataTable: React.FC<DataTableProps> = ({
   pageSize = 10,
   isLoading,
 }) => {
-  const [tableData, setTableData] = useState<Stock[]>([]);
+  const [tableData, setTableData] = useState<any[]>([]);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isSort, setIsSort] = useState<boolean>(false);
