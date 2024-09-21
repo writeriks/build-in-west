@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { type ColumnDef, type Table } from "@tanstack/react-table";
 import {
@@ -20,6 +20,7 @@ import {
 import DataTableRow from "../data-table-row/data-table-row";
 import { TableBody } from "../../ui/table";
 import TableEmptyRow from "../table-empty-row/table-empty-row";
+import Loading from "../../common/loading/loading";
 
 interface DataTableBodyProps {
   table: Table<any>;
@@ -37,7 +38,14 @@ const DataTableBody: React.FC<DataTableBodyProps> = ({
   isSort,
   setTableData,
   setDataOnDragEnd,
+  isLoading,
 }) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const sensors = useSensors(
     useSensor(TouchSensor),
     useSensor(MouseSensor),
@@ -69,6 +77,11 @@ const DataTableBody: React.FC<DataTableBodyProps> = ({
   return (
     <>
       <TableBody>
+        {isMounted && isLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-70">
+            <Loading />
+          </div>
+        )}
         {table.getRowModel().rows?.length ? (
           <DndContext
             sensors={sensors}

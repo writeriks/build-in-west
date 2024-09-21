@@ -11,8 +11,9 @@ const Loading = () => (
       isClickToPauseDisabled={true}
       width={100}
       height={100}
+      style={{ margin: 0 }}
     />
-    <span className="p-3 text-lg font-bold ">Loading.. Please wait.</span>
+    <span className=" text-lg font-bold ">Loading.. Please wait.</span>
   </>
 );
 
